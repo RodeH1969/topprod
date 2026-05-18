@@ -471,7 +471,40 @@
     font-weight: 700; text-align: center;
   }
 
-  /* ── RULES BUTTON ── */
+  /* ── SWAP TOAST ── */
+  #swap-toast {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 165;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 20px; padding: 20px 32px;
+    display: flex; align-items: center; gap: 14px;
+    box-shadow: 0 0 40px rgba(124,58,237,0.6);
+    opacity: 0; pointer-events: none;
+    transition: transform 0.35s cubic-bezier(.17,.67,.35,1.4), opacity 0.25s;
+    white-space: nowrap;
+  }
+  #swap-toast.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  #swap-toast.hiding {
+    transform: translate(-50%, -50%) scale(0.85);
+    opacity: 0;
+    transition: transform 0.2s ease-in, opacity 0.2s ease-in;
+  }
+  #swap-toast-icon { font-size: 44px; line-height: 1; }
+  #swap-toast-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 2px; color: #fff; line-height: 1.3;
+  }
+  #swap-toast-text span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 1px;
+    color: rgba(255,255,255,0.7); display: block;
+    text-transform: uppercase;
+  }
   #rules-btn {
     background: rgba(255,255,255,0.08);
     border: 1.5px solid rgba(255,255,255,0.2);
@@ -982,6 +1015,12 @@
 
     <button id="rules-play-btn" onclick="closeRules()">GOT IT — LET'S PLAY!</button>
   </div>
+</div>
+
+<!-- SWAP TOAST -->
+<div id="swap-toast">
+  <span id="swap-toast-icon">🃏</span>
+  <div id="swap-toast-text">You stole their card!<br><span>Now pick your stat wisely</span></div>
 </div>
 
 <!-- GAME OVER -->
@@ -1863,7 +1902,18 @@ function doSwap() {
     pi.classList.add('flipped');
   }, 100);
 
-  setStatus('🔄 Cards swapped! Now pick your box.');
+  setStatus('🃏 You stole their card! Now pick your stat wisely... 👇');
+  showSwapToast();
+}
+
+function showSwapToast() {
+  const toast = document.getElementById('swap-toast');
+  toast.classList.remove('hiding');
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.add('hiding');
+    setTimeout(() => toast.classList.remove('show', 'hiding'), 250);
+  }, 1800);
 }
 
 // ── ZOOM ─────────────────────────────────────────────────────────────
@@ -1928,7 +1978,7 @@ function doShare() {
              + `Sweet! I beat Today's Trolley Master in ${rounds} rounds! 🏆\n`
              + `${squares}\n\n`
              + `🟩 My wins  🟥 TM wins  🟦 Tie\n\n`
-             + `That's a tale worth telling!! Can you beat them? 👉 ${location.href}`;
+             + `How did you go? 👉 ${location.href}`;
 
   if (navigator.share) {
     navigator.share({ title: 'TOP PROD', text: text, url: location.href })
