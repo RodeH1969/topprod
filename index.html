@@ -679,32 +679,60 @@
     display: flex; align-items: center; justify-content: center;
   }
 
-  /* ── GAME OVER SCREEN ── */
+  /* ── GAME OVER ── */
   #gameover {
     display: none; position: fixed; inset: 0; z-index: 180;
-    background: rgba(0,0,0,0.95);
+    background: rgba(0,0,0,0.96);
     flex-direction: column; align-items: center; justify-content: center;
-    gap: 16px; padding: 32px; text-align: center;
+    padding: 32px; text-align: center;
     backdrop-filter: blur(12px);
   }
   #gameover.open { display: flex; }
-  #go-emoji { font-size: 80px; }
-  #go-title {
+  #go-title-win, #go-title-lose {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 56px; letter-spacing: 4px;
   }
-  #go-sub {
+  #go-title-win  { color: #4ade80; }
+  #go-title-lose { color: #f87171; }
+  #go-sub-win, #go-sub-lose {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 18px; color: rgba(255,255,255,0.6);
   }
-  #go-restart {
-    margin-top: 12px;
+  #go-share-btn {
+    background: linear-gradient(135deg, #ec4899, #f43f5e);
+    color: #fff; border: none; outline: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; letter-spacing: 2px;
+    padding: 14px 32px; border-radius: 30px;
+    cursor: pointer; width: 100%; max-width: 300px;
+    box-shadow: 0 6px 24px rgba(244,63,94,0.5);
+    animation: sharePulse 1.6s ease-in-out infinite;
+  }
+  @keyframes sharePulse {
+    0%,100% { box-shadow: 0 6px 24px rgba(244,63,94,0.5); }
+    50%      { box-shadow: 0 6px 36px rgba(244,63,94,0.9), 0 0 0 4px rgba(244,63,94,0.2); }
+  }
+  #go-restart-win, #go-restart-lose {
     background: var(--aldi-orange); color: #fff; border: none; outline: none;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px; letter-spacing: 2px;
-    padding: 14px 40px; border-radius: 30px;
-    cursor: pointer;
-    box-shadow: 0 6px 24px rgba(255,102,0,0.5);
+    font-size: 20px; letter-spacing: 2px;
+    padding: 12px 36px; border-radius: 30px;
+    cursor: pointer; width: 100%; max-width: 300px;
+    box-shadow: 0 4px 16px rgba(255,102,0,0.4);
+  }
+  #go-tomorrow-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: #fff; outline: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px; letter-spacing: 2px;
+    padding: 12px 36px; border-radius: 30px;
+    cursor: pointer; width: 100%; max-width: 300px;
+  }
+  #go-tomorrow-note {
+    font-size: 12px; color: rgba(255,255,255,0.3);
+    font-family: 'Barlow', sans-serif; font-style: italic;
+    max-width: 260px;
   }
 
   /* dealing card animation */
@@ -929,10 +957,26 @@
 
 <!-- GAME OVER -->
 <div id="gameover">
-  <div id="go-emoji">🏆</div>
-  <div id="go-title" id="go-title">CHAMPION!</div>
-  <div id="go-sub">You conquered all the brands</div>
-  <button id="go-restart" onclick="restartGame()">PLAY AGAIN</button>
+  <!-- WIN screen -->
+  <div id="go-win" style="display:none; flex-direction:column; align-items:center; gap:14px; text-align:center;">
+    <div id="go-emoji-win" style="font-size:80px;">🏆</div>
+    <div id="go-title-win">CHAMPION!</div>
+    <div id="go-sub-win">You emptied the Trolley Master's cart!</div>
+    <button id="go-share-btn" onclick="doShare()">
+      📣 Share Your Win
+    </button>
+    <button id="go-restart-win" onclick="restartGame()">PLAY AGAIN</button>
+  </div>
+
+  <!-- LOSE screen -->
+  <div id="go-lose" style="display:none; flex-direction:column; align-items:center; gap:14px; text-align:center;">
+    <div style="font-size:80px;">🛒</div>
+    <div id="go-title-lose">TROLLED!</div>
+    <div id="go-sub-lose">The Trolley Master cleaned you out.</div>
+    <button id="go-restart-lose" onclick="restartGame()">PLAY AGAIN</button>
+    <button id="go-tomorrow-btn" onclick="doTomorrow()">🗓️ Play Tomorrow</button>
+    <div id="go-tomorrow-note">A fresh shuffle awaits — new cards, new battle.</div>
+  </div>
 </div>
 
 <script>
@@ -1345,6 +1389,7 @@ const MOD_SET_B = [
 
 // ── GAME STATE ─────────────────────────────────────────────────────
 let playerDeck = [], compDeck = [], tiePile = [];
+let roundHistory = []; // 'w' = win, 'l' = lose, 't' = tie
 let activePlayer = null, activeComp = null;
 let swapsLeft = 2;
 let canInteract = false;
@@ -1660,12 +1705,14 @@ function resolveBattle(mod) {
   const cFmt = fmt(cVal, mod.unit);
 
   if (isTie) {
+    roundHistory.push('t');
     sfxTie();
     showResult('tie', '🤝', 'DEAD HEAT',
       `Both score ${pFmt} — the pile grows!`,
       pFmt, cFmt, false, false);
     tiePile.push(activePlayer, activeComp);
   } else if (playerWins) {
+    roundHistory.push('w');
     sfxRoundWin();
     showResult('win', '⚡', 'YOU WIN!',
       `${activePlayer.name} takes it!`,
@@ -1673,6 +1720,7 @@ function resolveBattle(mod) {
     playerDeck.push(activePlayer, activeComp, ...tiePile);
     tiePile = [];
   } else {
+    roundHistory.push('l');
     sfxRoundLose();
     showResult('lose', '🛒', 'TM WINS',
       `The Trolley Master cleans up!`,
@@ -1789,21 +1837,54 @@ function setStatus(msg) {
 function endGame() {
   const playerWon = compDeck.length === 0;
   const go = document.getElementById('gameover');
+
   if (playerWon) {
     sfxJackpot();
+    document.getElementById('go-win').style.display  = 'flex';
+    document.getElementById('go-lose').style.display = 'none';
   } else {
     sfxGameLose();
+    document.getElementById('go-win').style.display  = 'none';
+    document.getElementById('go-lose').style.display = 'flex';
   }
-  document.getElementById('go-emoji').textContent = playerWon ? '🏆' : '🛒';
-  document.getElementById('go-title').textContent = playerWon ? 'CHAMPION!' : 'TROLLED!';
-  document.getElementById('go-sub').textContent   = playerWon
-    ? 'You emptied the Trolley Master\'s cart!'
-    : 'The Trolley Master cleaned you out. Try again!';
   go.classList.add('open');
 }
 
+function doShare() {
+  const squares = roundHistory.map(r => r === 'w' ? '🟩' : r === 'l' ? '🟥' : '🟦').join('');
+  const rounds = roundHistory.length;
+  const wins   = roundHistory.filter(r => r === 'w').length;
+  const text = `🛒 TOP PROD — Beat Today's Trolley Master!\n\n`
+             + `Sweet! I won in ${rounds} rounds! 🏆\n`
+             + `${squares}\n\n`
+             + `🟩 My wins  🟥 TM wins  🟦 Tie\n\n`
+             + `That's a tale worth telling!! Can you beat them? 👉 ${location.href}`;
+
+  if (navigator.share) {
+    navigator.share({ title: 'TOP PROD', text: text, url: location.href })
+      .catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('go-share-btn');
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copied to clipboard!';
+      setTimeout(() => btn.textContent = orig, 2500);
+    });
+  }
+}
+
+function doTomorrow() {
+  const btn = document.getElementById('go-tomorrow-btn');
+  btn.textContent = '✅ See you tomorrow!';
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('gameover').classList.remove('open');
+  }, 1800);
+}
+
 function restartGame() {
-  playerDeck = []; compDeck = []; tiePile = [];
+  let playerDeck = [], compDeck = [], tiePile = [];
+  roundHistory = [];
   activePlayer = null; activeComp = null;
   swapsLeft = 2; canInteract = false; gameStarted = false;
   modSetToggle = false;
@@ -1826,8 +1907,10 @@ function restartGame() {
   document.getElementById('dealer-deck').style.display = 'flex';
   document.getElementById('deal-btn').style.display    = 'block';
   document.getElementById('gameover').classList.remove('open');
-
-  buildModGrid();
+  document.getElementById('go-win').style.display  = 'none';
+  document.getElementById('go-lose').style.display = 'none';
+  const tb = document.getElementById('go-tomorrow-btn');
+  tb.textContent = '🗓️ Play Tomorrow'; tb.disabled = false;
   setStatus('Tap DEAL to begin!');
 }
 </script>
