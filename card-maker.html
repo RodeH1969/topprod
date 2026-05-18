@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Top Prod Nutrition Card Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#eef2f6;--panel:#ffffff;--ink:#0e2940;--muted:#5b7288;--line:#c8d3dd;--blue1:#76c4ec;--blue2:#1d74a8;--blue3:#0b3a60;--gold1:#f6de9c;--gold2:#d7a646;--gold3:#8f6420;--danger:#a43f33;--radius:22px;--shadow:0 18px 40px rgba(14,41,64,.15)}
+    *{box-sizing:border-box} html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Barlow',sans-serif} body{min-height:100svh} img{max-width:100%;display:block}
+    .app{width:min(100%,1260px);margin:0 auto;padding:16px;display:grid;gap:16px}
+    .panel,.preview-wrap{background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow)}
+    .panel{padding:16px}.preview-wrap{padding:14px}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}.brand img{width:62px;height:62px;border-radius:14px;border:1px solid var(--line);object-fit:cover;background:#fff}.brand h1{margin:0;font-family:'Montserrat',sans-serif;font-size:clamp(1.35rem,3vw,1.95rem);line-height:1}.brand p{margin:4px 0 0;color:var(--muted)}
+    .section-title{margin:18px 0 10px;font-size:.88rem;font-weight:800;letter-spacing:.08em;color:var(--blue3);text-transform:uppercase}
+    .fields{display:grid;grid-template-columns:1fr;gap:12px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    .field label{display:block;margin-bottom:6px;font-size:.83rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--blue3)}
+    .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff;font:inherit;color:var(--ink)}
+    .field textarea{min-height:92px;resize:vertical}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px} button{min-height:48px;border:0;border-radius:999px;padding:12px 18px;font:inherit;font-weight:800;cursor:pointer} .primary{background:var(--blue3);color:#fff}.secondary{background:#e8eef4;color:var(--ink)}.ghost{background:#fff3d3;color:#7d5717}
+    .hint{margin-top:12px;color:var(--muted);font-size:.95rem;line-height:1.45}
+    .preview-grid{display:grid;gap:14px}
+    .card-shell{display:grid;place-items:center;padding:4px}
+    .card{width:min(100%,340px);aspect-ratio:5/7;border-radius:28px;padding:12px;background:linear-gradient(180deg,var(--blue1),#58aedb 55%,#6cc3ef);border:4px solid #b8d5e4;box-shadow:0 20px 38px rgba(14,41,64,.25)}
+    .inner{width:100%;height:100%;border-radius:20px;border:2px solid rgba(246,222,156,.95);background:linear-gradient(160deg,#0f5179 0%,#1772a7 35%,#0d466c 60%,#123451 100%);padding:14px;position:relative;overflow:hidden}
+    .inner:before{content:'';position:absolute;inset:-30% auto auto -10%;width:70%;height:140%;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0));transform:rotate(18deg);pointer-events:none}
+    .mini-logo{display:flex;justify-content:center;margin-bottom:12px}.mini-logo img{width:92px;filter:drop-shadow(0 5px 8px rgba(0,0,0,.28))}
+    .front-title,.back-title{background:linear-gradient(180deg,var(--gold1),var(--gold2));border-radius:14px;padding:10px 12px;text-align:center;color:#14324a;box-shadow:inset 0 2px 0 rgba(255,255,255,.45);font-weight:800;position:relative;z-index:1}
+    .front-title small,.back-title small{display:block;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase}
+    .packshot{width:76%;aspect-ratio:1/1;margin:14px auto 12px;border-radius:16px;background:linear-gradient(180deg,#f7e8b7,#c9922e);padding:10px;display:grid;place-items:center;box-shadow:inset 0 2px 0 rgba(255,255,255,.48);position:relative;z-index:1}.packshot img{width:100%;height:100%;object-fit:contain;background:rgba(255,255,255,.55);border-radius:10px}
+    .prod-name{text-align:center;font-size:clamp(1rem,3vw,1.2rem);line-height:1.05;font-weight:800;text-transform:uppercase;color:#fff6de;position:relative;z-index:1}.prod-meta{text-align:center;color:#dfeaf3;font-size:.92rem;margin-top:4px;position:relative;z-index:1}.front-footer,.back-footer{position:absolute;left:14px;right:14px;bottom:12px;text-align:center;color:#dce7ef;font-size:.69rem;letter-spacing:.03em}
+    .stats-box{margin-top:14px;background:rgba(6,24,40,.44);border:1px solid rgba(246,222,156,.44);border-radius:16px;padding:10px 12px;display:grid;gap:7px;position:relative;z-index:1}.stat{display:flex;justify-content:space-between;align-items:center;gap:10px}.stat .k{font-size:.83rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#f8e0a2}.stat .v{font-size:.97rem;font-weight:800;color:#fff}
+    .compare-note{margin-top:10px;text-align:center;color:#f3d98f;font-size:.82rem;font-weight:700;position:relative;z-index:1}
+    @media (min-width:980px){.app{grid-template-columns:minmax(380px,480px) 1fr}.panel{position:sticky;top:16px}.preview-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:620px){.row2,.row3{grid-template-columns:1fr}.panel{padding:14px}.card{width:min(100%,320px)}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="panel">
+      <div class="brand">
+        <img src="./logo-style-reference.jpg" alt="Top Prod style reference" />
+        <div>
+          <h1>Top Prod Card Maker</h1>
+          <p>Built for the front and back of the card that actually matter: product identity on the front, nutrition battle stats on the back.</p>
+        </div>
+      </div>
+
+      <div class="section-title">Front of card</div>
+      <div class="fields">
+        <div class="field"><label for="name">Product name</label><input id="name" value="Golden Peanut Butter"></div>
+        <div class="row2">
+          <div class="field"><label for="brand">Brand</label><input id="brand" value="Golden"></div>
+          <div class="field"><label for="category">Category</label><input id="category" value="Spreads"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label for="packWeight">Pack weight / size</label><input id="packWeight" value="375g"></div>
+          <div class="field"><label for="unitType">Unit type</label><select id="unitType"><option selected>g</option><option>ml</option><option>kg</option><option>L</option><option>each</option></select></div>
+          <div class="field"><label for="image">Product image path</label><input id="image" value="./products/golden-peanut-butter.png"></div>
+        </div>
+      </div>
+
+      <div class="section-title">Back of card: battle stats</div>
+      <div class="fields">
+        <div class="row2">
+          <div class="field"><label for="energy">Energy kJ per 100g</label><input id="energy" value="2610"></div>
+          <div class="field"><label for="protein">Protein g per 100g</label><input id="protein" value="23.9"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="fatTotal">Fat total g per 100g</label><input id="fatTotal" value="52.5"></div>
+          <div class="field"><label for="satFat">Saturated fat g per 100g</label><input id="satFat" value="10.4"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="carbs">Carbohydrate g per 100g</label><input id="carbs" value="11.8"></div>
+          <div class="field"><label for="sugars">Sugars g per 100g</label><input id="sugars" value="7.9"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="fibre">Dietary fibre g per 100g</label><input id="fibre" value="7.0"></div>
+          <div class="field"><label for="sodium">Sodium mg per 100g</label><input id="sodium" value="529"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="price">Price AUD</label><input id="price" value="4.29"></div>
+          <div class="field"><label for="unitPrice">Unit price per 100g</label><input id="unitPrice" value="1.14"></div>
+        </div>
+        <div class="field"><label for="notes">Notes</label><textarea id="notes">Capture the measurable label data. These are the comparable battle values that drive the game.</textarea></div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="downloadCardJson">Download card JSON</button>
+        <button class="secondary" id="copyCardJson">Copy JSON</button>
+        <button class="ghost" id="exampleBtn">Load peanut butter example</button>
+      </div>
+      <p class="hint">The logo image here is only a style reference for the blue-and-gold card look. The gameplay is based on the comparable nutrition and pricing measures in <strong>products.json</strong>, not on brand fluff. [cite:4][cite:109][file:1]</p>
+    </section>
+
+    <section class="preview-wrap">
+      <div class="preview-grid">
+        <div class="card-shell">
+          <article class="card" aria-label="Front of card preview">
+            <div class="inner">
+              <div class="mini-logo"><img src="./logo-style-reference.jpg" alt="Top Prod style reference"></div>
+              <div class="front-title"><small>Top Prod</small><span id="frontCategory">Spreads</span></div>
+              <div class="packshot"><img id="frontImage" src="./products/golden-peanut-butter.png" alt="Product preview"></div>
+              <div class="prod-name" id="frontName">Golden Peanut Butter</div>
+              <div class="prod-meta" id="frontMeta">Golden · 375g</div>
+              <div class="front-footer" id="frontFooter">Front: image, name, pack size</div>
+            </div>
+          </article>
+        </div>
+
+        <div class="card-shell">
+          <article class="card" aria-label="Back of card preview">
+            <div class="inner">
+              <div class="mini-logo"><img src="./logo-style-reference.jpg" alt="Top Prod style reference"></div>
+              <div class="back-title"><small>Battle stats</small><span id="backName">Golden Peanut Butter</span></div>
+              <div class="stats-box">
+                <div class="stat"><span class="k">Energy /100g</span><span class="v" id="pvEnergy">2610 kJ</span></div>
+                <div class="stat"><span class="k">Protein /100g</span><span class="v" id="pvProtein">23.9 g</span></div>
+                <div class="stat"><span class="k">Fat /100g</span><span class="v" id="pvFat">52.5 g</span></div>
+                <div class="stat"><span class="k">Sat fat /100g</span><span class="v" id="pvSatFat">10.4 g</span></div>
+                <div class="stat"><span class="k">Carbs /100g</span><span class="v" id="pvCarbs">11.8 g</span></div>
+                <div class="stat"><span class="k">Sugars /100g</span><span class="v" id="pvSugars">7.9 g</span></div>
+                <div class="stat"><span class="k">Fibre /100g</span><span class="v" id="pvFibre">7.0 g</span></div>
+                <div class="stat"><span class="k">Sodium /100g</span><span class="v" id="pvSodium">529 mg</span></div>
+                <div class="stat"><span class="k">Price</span><span class="v" id="pvPrice">$4.29</span></div>
+                <div class="stat"><span class="k">Unit price</span><span class="v" id="pvUnitPrice">$1.14 /100g</span></div>
+              </div>
+              <div class="compare-note">These are the numbers that the battle runs on.</div>
+              <div class="back-footer" id="backFooter">Back: comparable nutrition measures</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const ids=['name','brand','category','packWeight','unitType','image','energy','protein','fatTotal','satFat','carbs','sugars','fibre','sodium','price','unitPrice','notes'];
+    const el=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));
+    const out={frontCategory:document.getElementById('frontCategory'),frontImage:document.getElementById('frontImage'),frontName:document.getElementById('frontName'),frontMeta:document.getElementById('frontMeta'),frontFooter:document.getElementById('frontFooter'),backName:document.getElementById('backName'),backFooter:document.getElementById('backFooter'),pvEnergy:document.getElementById('pvEnergy'),pvProtein:document.getElementById('pvProtein'),pvFat:document.getElementById('pvFat'),pvSatFat:document.getElementById('pvSatFat'),pvCarbs:document.getElementById('pvCarbs'),pvSugars:document.getElementById('pvSugars'),pvFibre:document.getElementById('pvFibre'),pvSodium:document.getElementById('pvSodium'),pvPrice:document.getElementById('pvPrice'),pvUnitPrice:document.getElementById('pvUnitPrice')};
+    function slugify(v){return v.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')}
+    function num(v){const n=Number(v);return Number.isFinite(n)?n:null}
+    function data(){return{ id:slugify(el.name.value||'product'), name:el.name.value.trim(), brand:el.brand.value.trim(), category:el.category.value.trim(), pack_size:el.packWeight.value.trim(), unit_type:el.unitType.value, image:el.image.value.trim(), pricing:{ price_aud:num(el.price.value), unit_price_per_100g_aud:num(el.unitPrice.value) }, nutrition_per_100g:{ energy_kj:num(el.energy.value), protein_g:num(el.protein.value), fat_total_g:num(el.fatTotal.value), saturated_fat_g:num(el.satFat.value), carbohydrate_g:num(el.carbs.value), sugars_g:num(el.sugars.value), dietary_fibre_g:num(el.fibre.value), sodium_mg:num(el.sodium.value) }, notes:el.notes.value.trim() }}
+    function sync(){const d=data();out.frontCategory.textContent=d.category||'Category';out.frontImage.src=d.image||'./products/placeholder.png';out.frontName.textContent=d.name||'Product';out.frontMeta.textContent=`${d.brand||'Brand'} · ${d.pack_size||'-'}`;out.frontFooter.textContent=`${d.category||'Category'} · ${d.id}`;out.backName.textContent=d.name||'Product';out.backFooter.textContent=`Back: per-100g battle stats`;out.pvEnergy.textContent=`${d.nutrition_per_100g.energy_kj ?? '-'} kJ`;out.pvProtein.textContent=`${d.nutrition_per_100g.protein_g ?? '-'} g`;out.pvFat.textContent=`${d.nutrition_per_100g.fat_total_g ?? '-'} g`;out.pvSatFat.textContent=`${d.nutrition_per_100g.saturated_fat_g ?? '-'} g`;out.pvCarbs.textContent=`${d.nutrition_per_100g.carbohydrate_g ?? '-'} g`;out.pvSugars.textContent=`${d.nutrition_per_100g.sugars_g ?? '-'} g`;out.pvFibre.textContent=`${d.nutrition_per_100g.dietary_fibre_g ?? '-'} g`;out.pvSodium.textContent=`${d.nutrition_per_100g.sodium_mg ?? '-'} mg`;out.pvPrice.textContent=d.pricing.price_aud!=null?`$${d.pricing.price_aud.toFixed(2)}`:'-';out.pvUnitPrice.textContent=d.pricing.unit_price_per_100g_aud!=null?`$${d.pricing.unit_price_per_100g_aud.toFixed(2)} /100g`:'-';out.frontImage.onerror=()=>{out.frontImage.src='./products/placeholder.png';};}
+    ids.forEach(id=>{el[id].addEventListener('input',sync);el[id].addEventListener('change',sync);});
+    document.getElementById('copyCardJson').addEventListener('click',async()=>{const txt=JSON.stringify(data(),null,2);try{await navigator.clipboard.writeText(txt);alert('Card JSON copied.');}catch{alert('Clipboard copy failed. Use download instead.');}});
+    document.getElementById('downloadCardJson').addEventListener('click',()=>{const d=data();const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${d.id||'product'}.json`;a.click();URL.revokeObjectURL(a.href);});
+    document.getElementById('exampleBtn').addEventListener('click',()=>{el.name.value='Golden Peanut Butter';el.brand.value='Golden';el.category.value='Spreads';el.packWeight.value='375g';el.unitType.value='g';el.image.value='./products/golden-peanut-butter.png';el.energy.value='2610';el.protein.value='23.9';el.fatTotal.value='52.5';el.satFat.value='10.4';el.carbs.value='11.8';el.sugars.value='7.9';el.fibre.value='7.0';el.sodium.value='529';el.price.value='4.29';el.unitPrice.value='1.14';el.notes.value='Use the factual per-100g label values as the battle stats.';sync();});
+    sync();
+  </script>
+</body>
+</html>

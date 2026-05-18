@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TOP PROD: Battle of the Brands</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --aldi-blue: #003DA5;
+    --aldi-orange: #FF6600;
+    --aldi-yellow: #FFD700;
+    --dark: #0a0a0f;
+    --dark2: #12121a;
+    --dark3: #1a1a2e;
+    --card-w: 155px;
+    --card-h: 240px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--dark);
+    color: #fff;
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(0,61,165,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(255,102,0,0.15) 0%, transparent 60%);
+  }
+
+  /* ── SPLASH ── */
+  #splash {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--dark);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 24px;
+  }
+  #splash-logo-wrap {
+    width: 180px; height: 270px;
+    perspective: 800px;
+  }
+  #splash-card {
+    width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    animation: splashSpin 1.2s cubic-bezier(.4,0,.2,1) forwards;
+    border-radius: 18px;
+    box-shadow: 0 0 60px rgba(255,102,0,0.5), 0 0 120px rgba(0,61,165,0.3);
+    border: 3px solid var(--aldi-orange);
+    overflow: hidden;
+    background: var(--dark2);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #splash-card img { width: 100%; height: 100%; object-fit: cover; }
+  @keyframes splashSpin {
+    0% { transform: scale(0.3) rotateY(-180deg); opacity: 0; }
+    60% { transform: scale(1.08) rotateY(10deg); opacity: 1; }
+    100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+  }
+  #splash-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px; letter-spacing: 4px;
+    color: var(--aldi-orange);
+    text-shadow: 0 0 30px rgba(255,102,0,0.6);
+    animation: fadeUp 0.6s 0.8s both;
+  }
+  #splash-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 600; letter-spacing: 3px;
+    color: rgba(255,255,255,0.5); text-transform: uppercase;
+    animation: fadeUp 0.6s 1s both;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  #splash.hiding {
+    animation: splashHide 0.5s forwards;
+  }
+  @keyframes splashHide {
+    to { opacity: 0; pointer-events: none; }
+  }
+
+  /* ── GAME SCREEN ── */
+  #game {
+    display: none; flex-direction: column;
+    min-height: 100vh; max-width: 440px;
+    margin: 0 auto; padding: 0 12px 12px;
+  }
+
+  /* Header */
+  #hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  #hdr-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 3px; color: var(--aldi-orange);
+  }
+  #hdr-sub { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; }
+  #score-row {
+    display: flex; gap: 10px; align-items: center;
+  }
+  .score-pill {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px; padding: 4px 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+  }
+  .score-pill span { color: var(--aldi-yellow); font-size: 16px; }
+
+  /* ── COMPUTER ROW ── */
+  .player-row {
+    display: flex; align-items: center;
+    gap: 10px; padding: 10px 0;
+  }
+  .player-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,0.4);
+    writing-mode: vertical-rl; text-orientation: mixed;
+    transform: rotate(180deg);
+  }
+
+  /* Card slot */
+  .card-slot {
+    width: var(--card-w); height: var(--card-h);
+    flex-shrink: 0;
+    perspective: 900px;
+    position: relative;
+  }
+  .card-inner {
+    width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    border-radius: 14px;
+  }
+  .card-face, .card-back-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    border-radius: 14px;
+  }
+  .card-back-face {
+    transform: rotateY(180deg);
+    background: #fff;
+    overflow: hidden;
+  }
+  .card-face {
+    background: var(--dark2);
+    border: 2px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; inset: 0;
+    flex-direction: column;
+    overflow: visible;
+  }
+  .card-face img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover; opacity: 1;
+    border-radius: 14px;
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+
+  /* Card face — HTML stats panel with product image */
+  .card-back-face {
+    transform: rotateY(180deg);
+    background: #fff;
+    display: flex; flex-direction: column; overflow: hidden;
+    border-radius: 14px;
+  }
+  .cf-header {
+    background: var(--aldi-blue);
+    padding: 4px 6px;
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+  }
+  .cf-logo {
+    width: 20px; height: 20px; object-fit: contain; flex-shrink: 0;
+    background: #fff; border-radius: 3px; padding: 1px;
+  }
+  .cf-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px; font-weight: 900; color: #fff;
+    line-height: 1.15; text-transform: uppercase; letter-spacing: 0.3px;
+    overflow: hidden; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  /* body = image left + stats right */
+  .cf-body {
+    display: flex; flex: 1; overflow: hidden;
+  }
+  .cf-img-wrap {
+    width: 46%; flex-shrink: 0;
+    background: #f0f4ff;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px; border-right: 1px solid #e0e8ff;
+    overflow: hidden;
+  }
+  .cf-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+  }
+  .cf-rows {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .cf-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 5px; flex: 1;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .cf-row:nth-child(odd)  { background: #eef2ff; }
+  .cf-row:nth-child(even) { background: #fff; }
+  .cf-row-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9.5px; font-weight: 700; color: #444;
+    text-transform: uppercase; letter-spacing: 0.1px;
+    white-space: nowrap;
+  }
+  .cf-row-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10.5px; font-weight: 900; color: var(--aldi-blue);
+    white-space: nowrap; margin-left: 2px;
+  }
+  .cf-price {
+    background: var(--aldi-orange); padding: 4px 6px;
+    text-align: center; flex-shrink: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px; color: #fff; letter-spacing: 1px;
+    border-radius: 0 0 14px 14px;
+  }
+
+  /* Zoom button on card */
+  .zoom-btn {
+    position: absolute; bottom: 6px; right: 6px; z-index: 10;
+    width: 26px; height: 26px;
+    background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px; color: #fff; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; transition: opacity 0.3s;
+    backdrop-filter: blur(4px);
+  }
+  .card-slot:hover .zoom-btn, .card-slot.revealed .zoom-btn { opacity: 1; }
+
+  /* Stack */
+  .stack-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .stack-box {
+    width: 56px; height: 76px;
+    background: var(--dark3);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .stack-box::before, .stack-box::after {
+    content: ''; position: absolute;
+    background: var(--dark3); border: 2px solid rgba(255,255,255,0.07);
+    border-radius: 10px; width: 100%; height: 100%; z-index: -1;
+  }
+  .stack-box::before { transform: translate(-3px, -3px); }
+  .stack-box::after  { transform: translate(-6px, -6px); }
+  .stack-count {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px; color: rgba(255,255,255,0.5);
+  }
+  .stack-label {
+    font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+    color: #ffffff; font-weight: 800;
+  }
+
+  /* ── MIDDLE SECTION ── */
+  #middle {
+    display: flex; gap: 10px; margin: 8px 0;
+    align-items: stretch;
+  }
+
+  /* Central pile */
+  #pile-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; min-width: 72px;
+  }
+  #pile-box {
+    width: 60px; height: 80px;
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 10px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+    background: rgba(255,255,255,0.02);
+  }
+  #pile-count {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px; color: rgba(255,255,255,0.3);
+  }
+  #pile-label { font-size: 9px; color: rgba(255,255,255,0.25); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* Dealer deck overlay */
+  #dealer-deck {
+    position: absolute; inset: -2px;
+    background: var(--dark3);
+    border: 2px solid var(--aldi-orange);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255,102,0,0.3);
+    transition: transform 0.1s, box-shadow 0.2s;
+  }
+  #dealer-deck:active { transform: scale(0.95); }
+  #dealer-deck img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+  #deal-btn {
+    background: var(--aldi-orange);
+    color: #fff; border: none; outline: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px; letter-spacing: 2px;
+    padding: 8px 16px; border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255,102,0,0.4);
+    transition: transform 0.1s, box-shadow 0.2s;
+  }
+  #deal-btn:active { transform: scale(0.96); }
+
+  /* ── MOD GRID ── */
+  #mod-grid {
+    flex: 1;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px; min-height: 110px;
+  }
+  #mod-grid.remixing { animation: remixFlash 0.7s ease-in-out; }
+  @keyframes remixFlash {
+    0%   { opacity:1; transform:scale(1); filter:brightness(1); }
+    20%  { opacity:0; transform:scale(0.9); filter:brightness(4); }
+    50%  { opacity:1; transform:scale(1.05); filter:brightness(2.5); }
+    80%  { opacity:0.6; transform:scale(0.97); filter:brightness(1.5); }
+    100% { opacity:1; transform:scale(1); filter:brightness(1); }
+  }
+
+  /* ── MOD CELLS — face-up always ── */
+  .mod-cell { cursor: pointer; border-radius: 10px; position: relative; }
+  .mod-cell-inner {
+    width: 100%; height: 100%; min-height: 50px;
+    background: var(--dark3);
+    border: 1.5px solid rgba(255,102,0,0.55);
+    border-radius: 10px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 4px 3px; gap: 2px;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative; overflow: hidden;
+  }
+  .mod-cell:not(.used):active .mod-cell-inner { background: rgba(255,102,0,0.2); }
+  .mod-cell-icon { font-size: 15px; line-height: 1; }
+  .mod-cell-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 7.5px; font-weight: 800; color: #fff;
+    text-transform: uppercase; letter-spacing: 0.3px;
+    text-align: center; line-height: 1.2;
+  }
+
+  /* USED stamp — diagonal red */
+  .mod-used-stamp {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.6); border-radius: 9px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px; letter-spacing: 2px; color: #ef4444;
+    border: 2px solid #ef4444;
+    transform: rotate(-18deg) scale(0);
+    transition: transform 0.3s cubic-bezier(.17,.67,.35,1.5);
+    pointer-events: none;
+  }
+  .mod-cell.used .mod-used-stamp  { transform: rotate(-18deg) scale(1); }
+  .mod-cell.used .mod-cell-inner  { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06); cursor: not-allowed; }
+  .mod-cell.used .mod-cell-label  { opacity: 0.25; }
+  .mod-cell.used .mod-cell-icon   { opacity: 0.25; }
+
+  /* ── TM CATEGORY HINT on face-down card ── */
+  .tm-hint {
+    position: absolute; bottom: 14px; left: 0; right: 0; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    opacity: 0; transition: opacity 0.5s 0.3s;
+    pointer-events: none;
+  }
+  .tm-hint-icon { font-size: 24px; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.8)); }
+  .tm-hint-txt {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 900; letter-spacing: 2px;
+    text-transform: uppercase; color: #fff;
+    background: rgba(0,0,0,0.7); padding: 2px 10px; border-radius: 6px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  }
+
+
+
+  /* ── SWAP AREA ── */
+  #swap-area {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px; min-width: 72px;
+  }
+  #swap-label-top {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 8px; font-weight: 900; letter-spacing: 2px;
+    color: var(--aldi-yellow); text-transform: uppercase; text-align: center;
+  }
+  #swap-hint {
+    font-size: 8px; color: rgba(255,220,80,0.45);
+    text-align: center; font-style: italic;
+    font-family: 'Barlow', sans-serif; line-height: 1.3;
+  }
+  #swap-btn {
+    background: linear-gradient(135deg, #92400e, #d97706, #fbbf24);
+    border: 2px solid rgba(255,220,80,0.5); outline: none;
+    color: #1c0a00; font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px; letter-spacing: 1px;
+    padding: 8px 4px; border-radius: 10px;
+    cursor: pointer; transition: all 0.15s;
+    box-shadow: 0 4px 16px rgba(251,191,36,0.5);
+    width: 100%; white-space: nowrap;
+  }
+  #swap-btn:disabled {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.07);
+    box-shadow: none; cursor: not-allowed;
+  }
+  #swap-btn:not(:disabled) { animation: swapGlow 2s ease-in-out infinite; }
+  #swap-btn:not(:disabled):active { transform: scale(0.94); }
+  @keyframes swapGlow {
+    0%,100% { box-shadow: 0 4px 14px rgba(251,191,36,0.45); }
+    50%      { box-shadow: 0 4px 28px rgba(251,191,36,0.9), 0 0 0 3px rgba(251,191,36,0.2); }
+  }
+  #swap-count {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9px; color: rgba(255,220,80,0.6);
+    text-transform: uppercase; letter-spacing: 1px;
+    font-weight: 700; text-align: center;
+  }
+
+  /* ── RULES BUTTON ── */
+  #rules-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    height: 28px; padding: 0 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+  }
+  #rules-btn:active { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); }
+
+  /* ── RULES MODAL ── */
+  #rules-modal {
+    position: fixed; inset: 0; z-index: 160;
+    background: rgba(0,0,0,0.88);
+    display: none; align-items: center; justify-content: center;
+    padding: 16px; backdrop-filter: blur(10px);
+  }
+  #rules-modal.open { display: flex; }
+  #rules-card-inner {
+    background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%);
+    border: 2px solid rgba(255,102,0,0.4);
+    border-radius: 22px; padding: 24px 20px 20px;
+    max-width: 360px; width: 100%;
+    max-height: 88vh; overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 60px rgba(255,102,0,0.2);
+    animation: rulesIn 0.35s cubic-bezier(.17,.67,.35,1.3);
+  }
+  @keyframes rulesIn {
+    from { transform: scale(0.85) translateY(20px); opacity: 0; }
+    to   { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  #rules-close-btn {
+    position: absolute; top: 14px; right: 14px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    color: #fff; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #rules-logo-wrap {
+    width: 52px; height: 52px; margin: 0 auto 10px;
+    border-radius: 10px; overflow: hidden; border: 2px solid var(--aldi-orange);
+    display: flex; align-items: center; justify-content: center; background: #fff;
+  }
+  #rules-logo-wrap img { width: 80%; object-fit: contain; }
+  #rules-heading {
+    font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 4px;
+    text-align: center; color: var(--aldi-orange); margin-bottom: 16px;
+  }
+  .rules-step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 9px; }
+  .rs-num {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--aldi-orange); font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+    color: #fff; margin-top: 1px;
+  }
+  .rs-txt { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+  .rs-txt b { color: #fff; }
+  .rs-txt em { color: var(--aldi-yellow); font-style: normal; }
+  .rules-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 12px 0; }
+  #rules-swap-box {
+    background: linear-gradient(135deg, rgba(146,64,14,0.35), rgba(251,191,36,0.12));
+    border: 1.5px solid rgba(251,191,36,0.4);
+    border-radius: 14px; padding: 12px 14px; margin: 12px 0;
+  }
+  #rules-swap-heading {
+    font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px;
+    color: var(--aldi-yellow); margin-bottom: 6px;
+  }
+  #rules-swap-body { font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+  #rules-swap-body b { color: var(--aldi-yellow); }
+  #rules-mods-heading {
+    font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px;
+    color: rgba(255,255,255,0.45); margin-bottom: 8px;
+  }
+  #rules-mods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 8px; }
+  .rm-item {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 6px 8px;
+    font-size: 11px; font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600; color: rgba(255,255,255,0.75);
+  }
+  #rules-remix-note {
+    font-size: 10px; color: rgba(255,255,255,0.35);
+    font-style: italic; text-align: center; margin-top: 4px;
+  }
+  #rules-play-btn {
+    width: 100%; margin-top: 16px;
+    background: var(--aldi-orange); color: #fff; border: none;
+    font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px;
+    padding: 13px; border-radius: 14px; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255,102,0,0.4);
+  }
+  #rules-play-btn:active { transform: scale(0.97); }
+
+  /* make result overlay more dramatic */
+  #result-card { padding: 52px 36px !important; min-width: 300px !important; }
+  #result-emoji { font-size: 96px !important; }
+  #result-headline { font-size: 60px !important; letter-spacing: 5px !important; }
+  #result-detail { font-size: 17px !important; }
+
+  /* ── STATUS BAR ── */
+  #status {
+    text-align: center; padding: 6px 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 800; letter-spacing: 1px;
+    color: #ffffff;
+    min-height: 28px;
+  }
+
+  /* ── ROUND RESULT OVERLAY ── */
+  #result-overlay {
+    position: fixed; inset: 0; z-index: 170;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  #result-overlay.show {
+    pointer-events: all;
+    opacity: 1;
+  }
+  #result-overlay.hiding {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in;
+  }
+
+  #result-bg {
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  #result-overlay.show #result-bg { opacity: 1; }
+
+  #result-card {
+    position: relative; z-index: 1;
+    text-align: center; padding: 40px 32px;
+    border-radius: 24px; min-width: 280px; max-width: 340px;
+    transform: scale(0.5) rotateX(20deg);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(.17,.67,.35,1.4), opacity 0.3s;
+    border: 3px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+  }
+  #result-overlay.show #result-card {
+    transform: scale(1) rotateX(0deg);
+    opacity: 1;
+  }
+  #result-overlay.hiding #result-card {
+    transform: scale(1.1) rotateX(-10deg);
+    opacity: 0;
+    transition: transform 0.25s ease-in, opacity 0.25s ease-in;
+  }
+  #result-overlay.hiding #result-bg { opacity: 0; }
+
+  #result-emoji { font-size: 72px; line-height: 1; margin-bottom: 12px; display: block; }
+  #result-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px; letter-spacing: 4px;
+    line-height: 1; margin-bottom: 8px;
+  }
+  #result-detail {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 600;
+    color: rgba(255,255,255,0.8); margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  #result-values {
+    display: flex; gap: 12px; justify-content: center; margin-bottom: 8px;
+  }
+  .rv-box {
+    background: rgba(0,0,0,0.3); border-radius: 10px;
+    padding: 8px 16px; min-width: 90px;
+  }
+  .rv-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
+  .rv-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; line-height: 1;
+  }
+  .rv-val.winner { color: var(--aldi-yellow); }
+
+  /* WIN state */
+  #result-card.win { background: rgba(5,90,10,0.85); }
+  #result-card.win #result-headline { color: #4ade80; }
+  #result-bg.win { background: radial-gradient(ellipse at center, rgba(22,163,74,0.6) 0%, rgba(0,0,0,0.85) 70%); }
+
+  /* LOSS state */
+  #result-card.lose { background: rgba(90,5,5,0.85); }
+  #result-card.lose #result-headline { color: #f87171; }
+  #result-bg.lose { background: radial-gradient(ellipse at center, rgba(185,28,28,0.6) 0%, rgba(0,0,0,0.85) 70%); }
+
+  /* TIE state */
+  #result-card.tie { background: rgba(50,40,5,0.85); }
+  #result-card.tie #result-headline { color: var(--aldi-yellow); }
+  #result-bg.tie { background: radial-gradient(ellipse at center, rgba(161,120,0,0.5) 0%, rgba(0,0,0,0.85) 70%); }
+
+  /* ── ZOOM MODAL ── */
+  #zoom-modal {
+    position: fixed; inset: 0; z-index: 150;
+    background: rgba(0,0,0,0.92);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+  }
+  #zoom-modal.open { display: flex; }
+  #zoom-img {
+    max-width: min(380px, 90vw);
+    max-height: 85vh;
+    border-radius: 18px;
+    box-shadow: 0 0 60px rgba(255,102,0,0.3);
+    animation: zoomIn 0.3s cubic-bezier(.17,.67,.35,1.3) forwards;
+  }
+  @keyframes zoomIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  #zoom-close {
+    position: absolute; top: 20px; right: 20px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── GAME OVER SCREEN ── */
+  #gameover {
+    display: none; position: fixed; inset: 0; z-index: 180;
+    background: rgba(0,0,0,0.95);
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; padding: 32px; text-align: center;
+    backdrop-filter: blur(12px);
+  }
+  #gameover.open { display: flex; }
+  #go-emoji { font-size: 80px; }
+  #go-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px; letter-spacing: 4px;
+  }
+  #go-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; color: rgba(255,255,255,0.6);
+  }
+  #go-restart {
+    margin-top: 12px;
+    background: var(--aldi-orange); color: #fff; border: none; outline: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; letter-spacing: 2px;
+    padding: 14px 40px; border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(255,102,0,0.5);
+  }
+
+  /* dealing card animation */
+  .deal-anim {
+    position: fixed; z-index: 90; pointer-events: none;
+    width: 50px; height: 74px;
+    background: var(--dark3); border: 2px solid var(--aldi-orange);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.45s cubic-bezier(.25,1,.5,1);
+    box-shadow: 0 4px 16px rgba(255,102,0,0.3);
+    overflow: hidden;
+  }
+  .deal-anim img { width: 80%; opacity: 0.7; object-fit: contain; }
+
+  /* pulse glow on player card when it's their turn */
+  @keyframes pulseGlow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,102,0,0); }
+    50% { box-shadow: 0 0 0 6px rgba(255,102,0,0.35); }
+  }
+  .card-slot.your-turn .card-inner { animation: pulseGlow 1.5s infinite; border-radius: 14px; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div id="splash-logo-wrap">
+    <div id="splash-card">
+      <img src="logo.png" alt="TOP PROD" onerror="this.style.display='none'">
+    </div>
+  </div>
+  <div id="splash-title">TOP PROD</div>
+  <div id="splash-sub">Battle of the Brands</div>
+</div>
+
+<!-- GAME -->
+<div id="game">
+
+  <!-- Header -->
+  <div id="hdr">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div>
+        <div id="hdr-title">TOP PROD</div>
+        <div id="hdr-sub">Battle of the Brands</div>
+      </div>
+      <button id="rules-btn" onclick="openRules()">Rules</button>
+    </div>
+    <div id="score-row">
+      <div class="score-pill">You <span id="s-player">-</span></div>
+      <div class="score-pill">TM <span id="s-comp">-</span></div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div id="status">Tap DEAL to begin!</div>
+
+  <!-- TROLLEY MASTER ROW -->
+  <div class="player-row">
+    <div class="player-label">Trolley Master</div>
+    <div class="card-slot" id="comp-slot">
+      <div class="card-inner" id="comp-inner">
+        <div class="card-face">
+          <img src="logo.png" alt="back" onerror="this.style.display='none'">
+          <div class="tm-hint" id="tm-hint"></div>
+        </div>
+        <div class="card-back-face" id="comp-face">
+          <div class="cf-header">
+            <img class="cf-logo" src="aldi.png" alt="">
+            <div class="cf-name" id="comp-cf-name">—</div>
+          </div>
+          <div class="cf-body">
+            <div class="cf-img-wrap">
+              <img id="comp-cf-img" src="" alt="">
+            </div>
+            <div class="cf-rows" id="comp-cf-rows"></div>
+          </div>
+          <div class="cf-price" id="comp-cf-price">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="stack-wrap">
+      <div class="stack-box">
+        <span class="stack-count" id="comp-count">-</span>
+      </div>
+      <div class="stack-label">TM Stack</div>
+    </div>
+  </div>
+
+  <!-- MIDDLE -->
+  <div id="middle">
+    <!-- Pile + Deal -->
+    <div id="pile-wrap">
+      <div id="pile-box">
+        <span id="pile-count">0</span>
+        <div id="pile-label">pile</div>
+        <div id="dealer-deck" onclick="startDeal()">
+          <img src="logo.png" alt="deck" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <button id="deal-btn" onclick="startDeal()">DEAL</button>
+    </div>
+
+    <!-- Modifier boxes -->
+    <div id="mod-grid"></div>
+
+    <!-- Swap -->
+    <div id="swap-area">
+      <div id="swap-label-top">YOUR POWER</div>
+      <button id="swap-btn" disabled onclick="doSwap()">🔄 SWAP</button>
+      <div id="swap-count">2 swaps left</div>
+      <div id="swap-hint">Steal the better card!</div>
+    </div>
+  </div>
+
+  <!-- PLAYER ROW -->
+  <div class="player-row" style="flex-direction: row-reverse;">
+    <div class="player-label" style="transform: rotate(0deg);">You</div>
+    <div class="card-slot" id="player-slot">
+      <div class="card-inner" id="player-inner">
+        <div class="card-face">
+          <img src="logo.png" alt="back" onerror="this.style.display='none'">
+        </div>
+        <div class="card-back-face" id="player-face">
+          <div class="cf-header">
+            <img class="cf-logo" src="aldi.png" alt="">
+            <div class="cf-name" id="player-cf-name">—</div>
+          </div>
+          <div class="cf-body">
+            <div class="cf-img-wrap">
+              <img id="player-cf-img" src="" alt="">
+            </div>
+            <div class="cf-rows" id="player-cf-rows"></div>
+          </div>
+          <div class="cf-price" id="player-cf-price">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="stack-wrap">
+      <div class="stack-box">
+        <span class="stack-count" id="player-count">-</span>
+      </div>
+      <div class="stack-label">Your Stack</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ROUND RESULT OVERLAY -->
+<div id="result-overlay">
+  <div id="result-bg"></div>
+  <div id="result-card">
+    <span id="result-emoji">⚡</span>
+    <div id="result-headline">YOU WIN</div>
+    <div id="result-detail">Your protein crushes theirs</div>
+    <div id="result-values">
+      <div class="rv-box">
+        <div class="rv-label">You</div>
+        <div class="rv-val winner" id="rv-player">23.9g</div>
+      </div>
+      <div class="rv-box">
+        <div class="rv-label">TM</div>
+        <div class="rv-val" id="rv-comp">6.3g</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ZOOM MODAL -->
+<div id="zoom-modal" onclick="closeZoom()">
+  <div id="zoom-close" onclick="closeZoom()">✕</div>
+  <img id="zoom-img" src="" alt="Card zoom">
+</div>
+
+<!-- RULES MODAL -->
+<div id="rules-modal" onclick="closeRules()">
+  <div id="rules-card-inner" onclick="event.stopPropagation()">
+    <div id="rules-close-btn" onclick="closeRules()">✕</div>
+    <div id="rules-logo-wrap">
+      <img src="logo.png" alt="TOP PROD" onerror="this.style.display='none'">
+    </div>
+    <div id="rules-heading">HOW TO PLAY</div>
+
+    <div class="rules-step"><span class="rs-num">1</span><span class="rs-txt">Tap <b>DEAL</b> — you and the Trolley Master each get 10 cards from 77 real Aldi products.</span></div>
+    <div class="rules-step"><span class="rs-num">2</span><span class="rs-txt">Your card flips face-up. Study your product's nutrition stats and price.</span></div>
+    <div class="rules-step"><span class="rs-num">3</span><span class="rs-txt">You can see all <b>8 battle rules</b> — pick one strategically. e.g. <em>💪 Highest Protein</em> or <em>💰 Lowest Price</em>. That rule decides the winner.</span></div>
+    <div class="rules-step"><span class="rs-num">4</span><span class="rs-txt">The Trolley Master's card flips. Whoever wins the chosen stat takes both cards.</span></div>
+    <div class="rules-step"><span class="rs-num">5</span><span class="rs-txt">Each rule gets a red <b>USED</b> stamp once played — you can't pick it again. Choose carefully!</span></div>
+    <div class="rules-step"><span class="rs-num">6</span><span class="rs-txt">After all 8 rules are used, they <b>remix</b> with opposite directions — Highest becomes Lowest and vice versa. First to drain the other's deck wins.</span></div>
+
+    <hr class="rules-divider">
+
+    <div id="rules-swap-box">
+      <div id="rules-swap-heading">🤝 TIES</div>
+      <div id="rules-swap-body">If both products score the same, both cards go to the <b>central pile</b>. The winner of the next round takes them all!</div>
+    </div>
+
+    <hr class="rules-divider">
+
+    <div id="rules-swap-box" style="margin-top:0">
+      <div id="rules-swap-heading">🔄 YOUR SWAP POWER</div>
+      <div id="rules-swap-body">Before picking a rule, you can <b>SWAP</b> your card with the Trolley Master's. Think theirs looks better? <b>Steal it.</b> You get <b>2 swaps per game</b> — use them wisely.</div>
+    </div>
+
+    <hr class="rules-divider">
+
+    <div id="rules-mods-heading">THE 8 STARTING RULES</div>
+    <div id="rules-mods-grid">
+      <div class="rm-item">💪 Highest Protein</div>
+      <div class="rm-item">🚫 Lowest Sugar</div>
+      <div class="rm-item">🌿 Highest Fibre</div>
+      <div class="rm-item">🧂 Lowest Sodium</div>
+      <div class="rm-item">🥗 Lowest Fat</div>
+      <div class="rm-item">⚡ Highest Energy</div>
+      <div class="rm-item">💰 Lowest Price</div>
+      <div class="rm-item">🍞 Highest Carbs</div>
+    </div>
+    <div id="rules-remix-note">After all 8 are used they flip to opposites — Highest ↔ Lowest!</div>
+
+    <button id="rules-play-btn" onclick="closeRules()">GOT IT — LET'S PLAY!</button>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover">
+  <div id="go-emoji">🏆</div>
+  <div id="go-title" id="go-title">CHAMPION!</div>
+  <div id="go-sub">You conquered all the brands</div>
+  <button id="go-restart" onclick="restartGame()">PLAY AGAIN</button>
+</div>
+
+<script>
+// ── SOUND ENGINE (Web Audio API — no files needed) ─────────────────
+let audioCtx = null;
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function masterGain(ctx, vol) {
+  const g = ctx.createGain();
+  g.gain.value = vol;
+  g.connect(ctx.destination);
+  return g;
+}
+
+// card swish — short filtered noise burst with pitch glide
+function sfxCardSwish(delay = 0) {
+  try {
+    const ctx = getCtx();
+    const t = ctx.currentTime + delay;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.18, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1);
+
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.setValueAtTime(3200, t);
+    bp.frequency.exponentialRampToValueAtTime(900, t + 0.15);
+    bp.Q.value = 1.2;
+
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0, t);
+    env.gain.linearRampToValueAtTime(0.35, t + 0.02);
+    env.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+
+    src.connect(bp);
+    bp.connect(env);
+    env.connect(ctx.destination);
+    src.start(t);
+    src.stop(t + 0.2);
+  } catch(e) {}
+}
+
+// card flip — single thwack
+function sfxCardFlip() {
+  try {
+    const ctx = getCtx();
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(280, t);
+    osc.frequency.exponentialRampToValueAtTime(60, t + 0.09);
+
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.5, t);
+    env.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+
+    osc.connect(env);
+    env.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.13);
+
+    // click transient
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    const ns = ctx.createBufferSource();
+    ns.buffer = buf;
+    const ng = ctx.createGain();
+    ng.gain.value = 0.25;
+    ns.connect(ng);
+    ng.connect(ctx.destination);
+    ns.start(t);
+  } catch(e) {}
+}
+
+// modifier box reveal — casino tick + sting
+function sfxBoxReveal() {
+  try {
+    const ctx = getCtx();
+    const t = ctx.currentTime;
+    [0, 0.05, 0.1].forEach((d, i) => {
+      const o = ctx.createOscillator();
+      o.type = 'square';
+      o.frequency.value = 440 + i * 220;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.15, t + d);
+      g.gain.exponentialRampToValueAtTime(0.001, t + d + 0.08);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t + d); o.stop(t + d + 0.09);
+    });
+  } catch(e) {}
+}
+
+// round win — bright ascending casino chime
+function sfxRoundWin() {
+  try {
+    const ctx = getCtx();
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
+    notes.forEach((freq, i) => {
+      const t = ctx.currentTime + i * 0.1;
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.4, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      // add shimmer
+      const o2 = ctx.createOscillator();
+      o2.type = 'sine';
+      o2.frequency.value = freq * 2;
+      const g2 = ctx.createGain();
+      g2.gain.setValueAtTime(0, t);
+      g2.gain.linearRampToValueAtTime(0.12, t + 0.02);
+      g2.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o2.connect(g2); g2.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.45);
+      o2.start(t); o2.stop(t + 0.35);
+    });
+  } catch(e) {}
+}
+
+// round loss — descending wah-wah
+function sfxRoundLose() {
+  try {
+    const ctx = getCtx();
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(320, t);
+    o.frequency.exponentialRampToValueAtTime(120, t + 0.45);
+
+    const wah = ctx.createBiquadFilter();
+    wah.type = 'bandpass';
+    wah.frequency.setValueAtTime(800, t);
+    wah.frequency.exponentialRampToValueAtTime(200, t + 0.45);
+    wah.Q.value = 4;
+
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.35, t);
+    env.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
+    o.connect(wah); wah.connect(env); env.connect(ctx.destination);
+    o.start(t); o.stop(t + 0.55);
+  } catch(e) {}
+}
+
+// tie — neutral blip pair
+function sfxTie() {
+  try {
+    const ctx = getCtx();
+    [0, 0.18].forEach((d) => {
+      const t = ctx.currentTime + d;
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = 350;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.3, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.16);
+    });
+  } catch(e) {}
+}
+
+// jackpot — full casino slot machine fanfare
+function sfxJackpot() {
+  try {
+    const ctx = getCtx();
+    const mg = masterGain(ctx, 0.7);
+
+    // coin shower noise bursts
+    for (let i = 0; i < 18; i++) {
+      const t = ctx.currentTime + 0.05 + i * 0.12;
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.06, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let j = 0; j < d.length; j++) d[j] = (Math.random() * 2 - 1);
+      const s = ctx.createBufferSource();
+      s.buffer = buf;
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 2000 + Math.random() * 2000;
+      bp.Q.value = 8;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.6, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      s.connect(bp); bp.connect(g); g.connect(mg);
+      s.start(t); s.stop(t + 0.07);
+    }
+
+    // triumphant fanfare melody
+    const melody = [
+      [523.25, 0],    // C5
+      [659.25, 0.15], // E5
+      [783.99, 0.30], // G5
+      [1046.5, 0.45], // C6
+      [987.77, 0.65], // B5
+      [1046.5, 0.80], // C6
+      [1174.66,0.95], // D6
+      [1318.51,1.10], // E6
+    ];
+    melody.forEach(([freq, delay]) => {
+      const t = ctx.currentTime + delay;
+      const o = ctx.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = freq;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.5, t + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      o.connect(g); g.connect(mg);
+      o.start(t); o.stop(t + 0.38);
+
+      // harmony fifth above
+      const o2 = ctx.createOscillator();
+      o2.type = 'sine';
+      o2.frequency.value = freq * 1.5;
+      const g2 = ctx.createGain();
+      g2.gain.setValueAtTime(0, t);
+      g2.gain.linearRampToValueAtTime(0.18, t + 0.04);
+      g2.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      o2.connect(g2); g2.connect(mg);
+      o2.start(t); o2.stop(t + 0.3);
+    });
+
+    // big final chord at 1.35s
+    [523.25, 659.25, 783.99, 1046.5, 1318.51].forEach((freq, i) => {
+      const t = ctx.currentTime + 1.35;
+      const o = ctx.createOscillator();
+      o.type = i % 2 === 0 ? 'triangle' : 'sine';
+      o.frequency.value = freq;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.4, t + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+      o.connect(g); g.connect(mg);
+      o.start(t); o.stop(t + 1.3);
+    });
+  } catch(e) {}
+}
+
+// game loss — dramatic descending minor arpeggio
+function sfxGameLose() {
+  try {
+    const ctx = getCtx();
+    const notes = [392, 329.63, 261.63, 196]; // G4 E4 C4 G3
+    notes.forEach((freq, i) => {
+      const t = ctx.currentTime + i * 0.18;
+      const o = ctx.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = freq;
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 800;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.35, t + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+      o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.55);
+    });
+  } catch(e) {}
+}
+
+// swap power used — whoosh + rising tone
+function sfxSwap() {
+  try {
+    const ctx = getCtx();
+    const t = ctx.currentTime;
+    // whoosh
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.25, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1);
+    const s = ctx.createBufferSource();
+    s.buffer = buf;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.setValueAtTime(200, t);
+    hp.frequency.exponentialRampToValueAtTime(4000, t + 0.2);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.4, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+    s.connect(hp); hp.connect(g); g.connect(ctx.destination);
+    s.start(t); s.stop(t + 0.26);
+    // rising sting
+    const o = ctx.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(400, t + 0.1);
+    o.frequency.exponentialRampToValueAtTime(900, t + 0.28);
+    const og = ctx.createGain();
+    og.gain.setValueAtTime(0.3, t + 0.1);
+    og.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+    o.connect(og); og.connect(ctx.destination);
+    o.start(t + 0.1); o.stop(t + 0.33);
+  } catch(e) {}
+}
+
+// ── PRODUCTS DATABASE ──────────────────────────────────────────────
+// Map from products.json — filename matches cards/ folder
+const ALL_PRODUCTS = [
+  { name:"Goldenvale Just Bran", img:"products/cereal/Goldenvalejustbran1.png", energy_kj:1260, protein:11.8, fat:2.4, saturated_fat:0.5, carbohydrate:39.9, sugars:17.6, dietary_fibre:35.7, sodium:388, price:2.99 },
+  { name:"Hillcrest Corn Flakes", img:"products/cereal/Hillcrestcornflakes1.png", energy_kj:1600, protein:6.9, fat:0.7, saturated_fat:0.3, carbohydrate:84.0, sugars:5.9, dietary_fibre:3.6, sodium:266, price:3.89 },
+  { name:"Organic Australian Oats", img:"products/cereal/Organicaustralianoats1.png", energy_kj:1590, protein:13.4, fat:8.9, saturated_fat:1.4, carbohydrate:55.3, sugars:0.9, dietary_fibre:11.3, sodium:5, price:2.79 },
+  { name:"Hillcrest Fruity Bursts Triple Berry", img:"products/cereal/Fruitybursts1.png", energy_kj:1500, protein:7.4, fat:2.1, saturated_fat:0.4, carbohydrate:71.3, sugars:22.3, dietary_fibre:7.7, sodium:45, price:4.99 },
+  { name:"Hillcrest Wheat Biscuits", img:"products/cereal/Hillcrestwheatbiscuits1.png", energy_kj:1461, protein:12.9, fat:1.3, saturated_fat:0.3, carbohydrate:65.5, sugars:2.6, dietary_fibre:10.6, sodium:261, price:5.09 },
+  { name:"Goldenvale Quick Oats", img:"products/cereal/Originalquickoats1.png", energy_kj:1600, protein:12.6, fat:8.9, saturated_fat:1.7, carbohydrate:56.7, sugars:1.0, dietary_fibre:11.4, sodium:5, price:2.99 },
+  { name:"Goldenvale Paleo Granola Honey Pecan", img:"products/cereal/Paleogranolahoneypecan1.png", energy_kj:2370, protein:17.3, fat:45.8, saturated_fat:16.3, carbohydrate:15.1, sugars:10.8, dietary_fibre:16.1, sodium:200, price:7.99 },
+  { name:"Arnott's Family Favourites", img:"products/biscuits/Arnottsfamilyfavorites1.png", energy_kj:1900, protein:5.6, fat:14.7, saturated_fat:8.0, carbohydrate:72.8, sugars:25.8, dietary_fibre:2.9, sodium:351, price:4.99 },
+  { name:"Belmont Hundreds & Thousands", img:"products/biscuits/Belmonthundredsandthousands1.png", energy_kj:2100, protein:4.5, fat:23.5, saturated_fat:17.0, carbohydrate:69.0, sugars:35.0, dietary_fibre:1.5, sodium:240, price:1.99 },
+  { name:"Belmont Cartwheels", img:"products/biscuits/Cartwheels1.png", energy_kj:1908, protein:4.4, fat:17.2, saturated_fat:10.8, carbohydrate:70.4, sugars:48.0, dietary_fibre:2.0, sodium:172, price:2.99 },
+  { name:"Hugo's Mini Eggs", img:"products/biscuits/Minieggs1.png", energy_kj:2367, protein:5.0, fat:39.5, saturated_fat:15.5, carbohydrate:45.5, sugars:38.6, dietary_fibre:0.0, sodium:182, price:2.99 },
+  { name:"Oreo Original", img:"products/biscuits/Oreo1.png", energy_kj:2040, protein:4.9, fat:20.4, saturated_fat:10.0, carbohydrate:69.9, sugars:38.0, dietary_fibre:2.6, sodium:380, price:4.99 },
+  { name:"Arnott's Shapes BBQ", img:"products/biscuits/Shapesoriginals1.png", energy_kj:2050, protein:7.5, fat:22.4, saturated_fat:5.3, carbohydrate:62.9, sugars:0.7, dietary_fibre:3.4, sodium:687, price:3.99 },
+  { name:"Belmont Skadoos Milkshake", img:"products/biscuits/Skadoos1.png", energy_kj:2232, protein:5.6, fat:30.8, saturated_fat:19.2, carbohydrate:58.0, sugars:40.0, dietary_fibre:2.2, sodium:176, price:2.99 },
+  { name:"Oh So Natural Almond Spread", img:"products/spreads/Almondspread1.png", energy_kj:2480, protein:19.2, fat:61.6, saturated_fat:5.0, carbohydrate:7.2, sugars:4.8, dietary_fibre:7.1, sodium:19, price:5.69 },
+  { name:"Bega Peanut Butter Crunchy", img:"products/spreads/Begapeanutbutter1.png", energy_kj:2610, protein:23.9, fat:52.5, saturated_fat:10.4, carbohydrate:11.8, sugars:7.9, dietary_fibre:7.0, sodium:539, price:7.39 },
+  { name:"Bramwells Cheddar Cheese Spread", img:"products/spreads/Cheddarcheesespread1.png", energy_kj:1200, protein:11.5, fat:25.5, saturated_fat:17.5, carbohydrate:4.5, sugars:3.5, dietary_fibre:0.0, sodium:1500, price:3.09 },
+  { name:"Bramwells Mixed Blossom Honey", img:"products/spreads/Mixedblossomhoney1.png", energy_kj:1420, protein:0.3, fat:0.1, saturated_fat:0.1, carbohydrate:83.6, sugars:82.4, dietary_fibre:0.0, sodium:16, price:2.99 },
+  { name:"Oh So Natural Crunchy PB", img:"products/spreads/Naturalcrunchypeanutbutter1.png", energy_kj:2400, protein:22.5, fat:53.7, saturated_fat:6.4, carbohydrate:8.0, sugars:0.1, dietary_fibre:11.6, sodium:5, price:3.99 },
+  { name:"Bramwells PB Crunchy", img:"products/spreads/Peanutbuttercrunch1.png", energy_kj:2560, protein:23.4, fat:49.8, saturated_fat:6.3, carbohydrate:15.5, sugars:11.8, dietary_fibre:7.5, sodium:480, price:3.09 },
+  { name:"Nutella Hazelnut Spread", img:"products/spreads/Nutella1.png", energy_kj:2228, protein:6.3, fat:30.9, saturated_fat:10.6, carbohydrate:57.5, sugars:56.3, dietary_fibre:3.0, sodium:42, price:11.99 },
+  { name:"Inner Goodness Coconut Yogurt", img:"products/yoghurt/Innergoodnesscoconutnatural500g.png", energy_kj:490, protein:1.4, fat:9.8, saturated_fat:8.9, carbohydrate:5.8, sugars:4.2, dietary_fibre:1.2, sodium:22, price:4.0 },
+  { name:"Lyttos Authentic Greek Yogurt", img:"products/yoghurt/Lyttosauthentic1.png", energy_kj:551, protein:7.0, fat:10.0, saturated_fat:7.3, carbohydrate:3.4, sugars:3.4, dietary_fibre:0.0, sodium:40, price:6.89 },
+  { name:"Vaalia Kids Strawberry Pouch", img:"products/yoghurt/Vaaliakidsstrawberrypouch140g.png", energy_kj:369, protein:4.6, fat:2.4, saturated_fat:1.7, carbohydrate:11.8, sugars:8.9, dietary_fibre:0.0, sodium:49, price:1.99 },
+  { name:"Yoguri High Protein Strawberry", img:"products/yoghurt/Yogurihighproteinstrawberry160g.png", energy_kj:245, protein:9.6, fat:0.3, saturated_fat:0.2, carbohydrate:4.1, sugars:3.4, dietary_fibre:0.1, sodium:41, price:2.19 },
+  { name:"Lyttos Light Greek Style Yogurt", img:"products/yoghurt/Lyttoslightgreekstyle1kg.png", energy_kj:374, protein:5.8, fat:4.0, saturated_fat:2.7, carbohydrate:8.0, sugars:7.0, dietary_fibre:0.0, sodium:66, price:3.59 },
+  { name:"Chobani Fit Raspberry Pouch", img:"products/yoghurt/Chobanifitraspberrypouch150g.png", energy_kj:260, protein:10.0, fat:0.2, saturated_fat:0.1, carbohydrate:4.7, sugars:4.2, dietary_fibre:0.7, sodium:39, price:2.45 },
+  { name:"Brooklea Lactose Free Kids Yogurt", img:"products/yoghurt/Brooklealactosefreekidsstrawberrypouch110g.png", energy_kj:365, protein:4.1, fat:2.8, saturated_fat:1.9, carbohydrate:11.2, sugars:10.5, dietary_fibre:0.2, sodium:45, price:1.25 },
+  { name:"Ocean Rise Yellowfin Tuna", img:"products/tinned/Oceanriseyellowfintuna425g.png", energy_kj:460, protein:24.5, fat:1.0, saturated_fat:0.3, carbohydrate:0.1, sugars:0.0, dietary_fibre:0.0, sodium:320, price:4.49 },
+  { name:"Corale Baked Beans", img:"products/tinned/Coralebakedbeans1.png", energy_kj:338, protein:4.7, fat:0.5, saturated_fat:0.1, carbohydrate:11.2, sugars:4.9, dietary_fibre:5.2, sodium:390, price:1.35 },
+  { name:"New Season 4 Bean Mix", img:"products/tinned/Newseason4beanmix420g.png", energy_kj:331, protein:5.1, fat:0.6, saturated_fat:0.1, carbohydrate:10.1, sugars:1.1, dietary_fibre:5.9, sodium:285, price:0.95 },
+  { name:"Sweet Valley Peach Slices", img:"products/tinned/Sweetvalleypeachslices825g.png", energy_kj:276, protein:0.3, fat:0.1, saturated_fat:0.0, carbohydrate:14.7, sugars:13.8, dietary_fibre:1.0, sodium:15, price:2.39 },
+  { name:"Ocean Rise Sardines in Oil", img:"products/tinned/Oceanrisesardinesoil1.png", energy_kj:890, protein:21.8, fat:13.8, saturated_fat:3.2, carbohydrate:0.5, sugars:0.0, dietary_fibre:0.0, sodium:440, price:1.09 },
+  { name:"Bramwells Tomato Soup", img:"products/tinned/Bramwellstomatosoup1.png", energy_kj:215, protein:0.9, fat:0.2, saturated_fat:0.0, carbohydrate:10.7, sugars:7.8, dietary_fibre:0.9, sodium:420, price:1.19 },
+  { name:"Asia Specialties Coconut Milk", img:"products/tinned/Asiaspecialtiescoconutmilk400ml.png", energy_kj:663, protein:1.1, fat:16.5, saturated_fat:15.2, carbohydrate:2.0, sugars:1.3, dietary_fibre:0.0, sodium:18, price:1.25 },
+  { name:"Imperial Grains Long Grain Rice", img:"products/rice pasta/Imperiallonggrainwhite2kg.png", energy_kj:1490, protein:6.8, fat:0.6, saturated_fat:0.2, carbohydrate:78.5, sugars:0.1, dietary_fibre:1.2, sodium:5, price:2.99 },
+  { name:"Imperial Grains Jasmine Rice", img:"products/rice pasta/Imperialjasminerice1.png", energy_kj:1490, protein:7.1, fat:0.8, saturated_fat:0.2, carbohydrate:77.8, sugars:0.2, dietary_fibre:1.3, sodium:5, price:2.69 },
+  { name:"Imperial Grains Brown Rice Pouch", img:"products/rice pasta/Imperialbrownricepouch1.png", energy_kj:682, protein:3.6, fat:2.5, saturated_fat:0.4, carbohydrate:29.8, sugars:0.5, dietary_fibre:2.6, sodium:12, price:1.49 },
+  { name:"Just Organic White Quinoa", img:"products/rice pasta/Justorganiquinoa1.png", energy_kj:1540, protein:14.1, fat:5.6, saturated_fat:0.6, carbohydrate:57.2, sugars:1.2, dietary_fibre:7.0, sodium:5, price:4.49 },
+  { name:"Cucina Pasta Spirals", img:"products/rice pasta/Cucinapastaspirals500g.png", energy_kj:1510, protein:12.0, fat:1.5, saturated_fat:0.3, carbohydrate:72.0, sugars:2.5, dietary_fibre:3.0, sodium:5, price:0.89 },
+  { name:"Remano Cous Cous", img:"products/rice pasta/Remanocouscous500g.png", energy_kj:1480, protein:12.5, fat:1.5, saturated_fat:0.3, carbohydrate:69.0, sugars:2.0, dietary_fibre:4.0, sodium:10, price:1.99 },
+  { name:"Imperial Grains Mexican Rice Pouch", img:"products/rice pasta/Imperialmexicanricepouch250g.png", energy_kj:695, protein:3.5, fat:2.8, saturated_fat:0.4, carbohydrate:28.5, sugars:1.5, dietary_fibre:2.1, sodium:340, price:2.09 },
+  { name:"Colway Tomato Sauce", img:"products/sauces/Colwaytomatosauce500ml.png", energy_kj:508, protein:0.9, fat:0.2, saturated_fat:0.1, carbohydrate:27.2, sugars:24.6, dietary_fibre:0.8, sodium:866, price:1.85 },
+  { name:"Remano Bolognese Sauce", img:"products/sauces/Remanobolognesesauce500g.png", energy_kj:243, protein:1.5, fat:1.2, saturated_fat:0.2, carbohydrate:9.3, sugars:6.4, dietary_fibre:1.8, sodium:420, price:2.29 },
+  { name:"Colway Real Mayonnaise", img:"products/sauces/Colwaymayonnaise1.png", energy_kj:2590, protein:1.1, fat:68.2, saturated_fat:5.2, carbohydrate:3.5, sugars:2.8, dietary_fibre:0.0, sodium:560, price:2.59 },
+  { name:"Asia Green Garden Sweet Chilli", img:"products/sauces/Asiagreengardensweetchilli700ml.png", energy_kj:816, protein:0.4, fat:0.2, saturated_fat:0.1, carbohydrate:46.8, sugars:43.5, dietary_fibre:0.5, sodium:1120, price:2.49 },
+  { name:"Colway Dijon Mustard", img:"products/sauces/Colwaydijonmustard1.png", energy_kj:645, protein:7.5, fat:11.2, saturated_fat:0.8, carbohydrate:3.2, sugars:1.8, dietary_fibre:3.0, sodium:2100, price:1.49 },
+  { name:"Colway BBQ Sauce", img:"products/sauces/Colwaybbqsauce1.png", energy_kj:620, protein:1.0, fat:0.3, saturated_fat:0.1, carbohydrate:34.1, sugars:30.5, dietary_fibre:0.9, sodium:920, price:1.69 },
+  { name:"Colway Worcestershire Sauce", img:"products/sauces/Colwayworcestershiresauce250ml.png", energy_kj:331, protein:0.7, fat:0.1, saturated_fat:0.1, carbohydrate:18.2, sugars:15.6, dietary_fibre:0.0, sodium:1050, price:1.89 },
+  { name:"Farmdale Full Cream Milk", img:"products/milk/Farmdalefullcream2L.png", energy_kj:269, protein:3.4, fat:3.4, saturated_fat:2.3, carbohydrate:4.8, sugars:4.8, dietary_fibre:0.0, sodium:45, price:3.10 },
+  { name:"Farmdale Skim Milk", img:"products/milk/Farmdaleskimmilk2L.png", energy_kj:149, protein:3.5, fat:0.1, saturated_fat:0.1, carbohydrate:4.9, sugars:4.9, dietary_fibre:0.0, sodium:47, price:3.10 },
+  { name:"Inner Goodness Almond Milk", img:"products/milk/Innergoodnessorganicunsweetenedalmond1L.png", energy_kj:70, protein:0.6, fat:1.4, saturated_fat:0.1, carbohydrate:0.3, sugars:0.1, dietary_fibre:0.4, sodium:35, price:2.29 },
+  { name:"Inner Goodness Barista Oat Milk", img:"products/milk/Innergoodnessbaristaoat1L.png", energy_kj:248, protein:1.0, fat:3.2, saturated_fat:0.3, carbohydrate:6.2, sugars:2.5, dietary_fibre:0.8, sodium:48, price:2.99 },
+  { name:"Inner Goodness Rice Milk", img:"products/milk/Innergoodnessricemilk1L.png", energy_kj:204, protein:0.3, fat:1.0, saturated_fat:0.1, carbohydrate:10.5, sugars:3.8, dietary_fibre:0.2, sodium:46, price:1.85 },
+  { name:"Inner Goodness Coconut Milk", img:"products/milk/Innergoodnessorganiccoconut1L.png", energy_kj:112, protein:0.2, fat:2.5, saturated_fat:2.4, carbohydrate:0.8, sugars:0.2, dietary_fibre:0.1, sodium:38, price:2.65 },
+  { name:"Farmdale Lactose Free Milk", img:"products/milk/Farmdalelactosefree1.png", energy_kj:269, protein:3.4, fat:3.4, saturated_fat:2.3, carbohydrate:4.8, sugars:4.8, dietary_fibre:0.0, sodium:45, price:1.99 },
+  { name:"Westcliff Apple Juice", img:"products/juices cordials/Westcliffapple2L.png", energy_kj:182, protein:0.2, fat:0.1, saturated_fat:0.0, carbohydrate:10.3, sugars:9.8, dietary_fibre:0.1, sodium:5, price:2.99 },
+  { name:"PICK'D Orange Juice", img:"products/juices cordials/Pickd100orangepulpfree2L.png", energy_kj:171, protein:0.9, fat:0.1, saturated_fat:0.1, carbohydrate:8.9, sugars:8.5, dietary_fibre:0.1, sodium:1, price:4.99 },
+  { name:"Westcliff Multi Vitamin Juice", img:"products/juices cordials/Westcliffmultivitamin2L.png", energy_kj:199, protein:0.4, fat:0.1, saturated_fat:0.1, carbohydrate:11.2, sugars:10.3, dietary_fibre:0.2, sodium:5, price:2.59 },
+  { name:"PICK'D Cloudy Apple Juice", img:"products/juices cordials/Pickd100cloudyapple2L.png", energy_kj:192, protein:0.1, fat:0.1, saturated_fat:0.1, carbohydrate:11.2, sugars:10.0, dietary_fibre:0.4, sodium:5, price:5.69 },
+  { name:"Ocean Spray Cranberry Classic", img:"products/juices cordials/Oceanspraycranberryclassic1-5L.png", energy_kj:201, protein:0.1, fat:0.1, saturated_fat:0.0, carbohydrate:11.4, sugars:11.2, dietary_fibre:0.1, sodium:8, price:5.69 },
+  { name:"Westcliff Pineapple Juice", img:"products/juices cordials/Westcliffunsweetenedpineapple1L.png", energy_kj:207, protein:0.4, fat:0.1, saturated_fat:0.0, carbohydrate:11.6, sugars:10.9, dietary_fibre:0.2, sodium:3, price:2.39 },
+  { name:"Westcliff Apple Raspberry Cordial", img:"products/juices cordials/Westcliffappleraspberrycordial1L.png", energy_kj:1054, protein:0.1, fat:0.1, saturated_fat:0.0, carbohydrate:61.2, sugars:60.1, dietary_fibre:0.1, sodium:15, price:2.29 },
+  { name:"International Cuisine Beef Lasagne", img:"products/frozen/Icuisinebeeflasagne1.png", energy_kj:562, protein:6.8, fat:5.4, saturated_fat:2.6, carbohydrate:14.1, sugars:2.8, dietary_fibre:1.2, sodium:320, price:2.99 },
+  { name:"International Cuisine Butter Chicken", img:"products/frozen/Icuisinebutterchicken375g.png", energy_kj:585, protein:7.2, fat:4.9, saturated_fat:2.5, carbohydrate:16.3, sugars:2.1, dietary_fibre:1.1, sodium:290, price:3.89 },
+  { name:"Health & Vitality Shepherd's Pie", img:"products/frozen/Healthvitalityshepherdspie400g.png", energy_kj:380, protein:5.9, fat:1.8, saturated_fat:0.8, carbohydrate:12.4, sugars:2.0, dietary_fibre:1.5, sodium:185, price:4.49 },
+  { name:"International Cuisine Mac Cheese", img:"products/frozen/Icuisinemaccheese1.png", energy_kj:610, protein:5.8, fat:6.2, saturated_fat:3.8, carbohydrate:16.5, sugars:1.5, dietary_fibre:0.8, sodium:340, price:2.99 },
+  { name:"Ocean Royale Fish Fillets", img:"products/frozen/Oceanroyalegoldencrumbed1kg.png", energy_kj:879, protein:12.7, fat:8.6, saturated_fat:1.7, carbohydrate:18.3, sugars:1.4, dietary_fibre:1.5, sodium:293, price:8.49 },
+  { name:"International Cuisine Singapore Noodles", img:"products/frozen/Icuisinesingaporenoodles375g.png", energy_kj:510, protein:4.8, fat:2.1, saturated_fat:0.4, carbohydrate:20.1, sugars:3.2, dietary_fibre:1.4, sodium:380, price:3.89 },
+  { name:"Farmwood Chicken Nuggets", img:"products/frozen/Farmwoodnuggets1kg.png", energy_kj:980, protein:13.5, fat:11.8, saturated_fat:2.8, carbohydrate:18.2, sugars:0.8, dietary_fibre:1.4, sodium:510, price:8.49 },
+  { name:"Indulge Vanilla Bean Ice Cream", img:"products/icecreams/Indulgevanillabeangourmet1L.png", energy_kj:940, protein:3.0, fat:13.5, saturated_fat:9.5, carbohydrate:23.8, sugars:21.2, dietary_fibre:0.2, sodium:50, price:5.99 },
+  { name:"Monarc Utopia Almond Bars", img:"products/icecreams/Monarcutopiaalmond1.png", energy_kj:1420, protein:5.3, fat:22.8, saturated_fat:13.5, carbohydrate:28.0, sugars:26.5, dietary_fibre:1.8, sodium:65, price:3.99 },
+  { name:"Streets Blue Ribbon Vanilla", img:"products/icecreams/Streetsblueribbonclassicvanilla2L.png", energy_kj:783, protein:2.1, fat:7.0, saturated_fat:5.8, carbohydrate:28.2, sugars:18.5, dietary_fibre:0.2, sodium:45, price:6.49 },
+  { name:"Milfina Jelli Pop", img:"products/icecreams/Milfinajellipop6pack450ml.png", energy_kj:980, protein:2.2, fat:9.5, saturated_fat:7.8, carbohydrate:34.5, sugars:28.1, dietary_fibre:0.3, sodium:52, price:4.99 },
+  { name:"Monarc Spider Stix", img:"products/icecreams/Monarcspiderstixvariety750ml.png", energy_kj:615, protein:1.5, fat:3.1, saturated_fat:2.4, carbohydrate:28.5, sugars:24.3, dietary_fibre:0.2, sodium:48, price:4.99 },
+  { name:"Monarc Crowns Vanilla Cones", img:"products/icecreams/Monarccrownsclassicvanillacones475ml.png", energy_kj:1220, protein:4.2, fat:14.7, saturated_fat:11.2, carbohydrate:32.6, sugars:24.5, dietary_fibre:1.2, sodium:65, price:3.39 },
+  { name:"Milfina Polar Bars Cookies & Cream", img:"products/icecreams/Milfinapolarbarscookiescream440ml.png", energy_kj:1189, protein:4.1, fat:10.3, saturated_fat:6.9, carbohydrate:43.8, sugars:23.9, dietary_fibre:1.2, sodium:189, price:3.59 },
+];
+
+// ── MODIFIER SETS ──────────────────────────────────────────────────
+const MOD_SET_A = [
+  { id:"protein",       label:"Highest Protein",  icon:"💪", type:"high", unit:"g" },
+  { id:"sugars",        label:"Lowest Sugar",      icon:"🚫", type:"low",  unit:"g" },
+  { id:"dietary_fibre", label:"Highest Fibre",     icon:"🌿", type:"high", unit:"g" },
+  { id:"sodium",        label:"Lowest Sodium",     icon:"🧂", type:"low",  unit:"mg"},
+  { id:"fat",           label:"Lowest Fat",        icon:"🥗", type:"low",  unit:"g" },
+  { id:"energy_kj",     label:"Highest Energy",    icon:"⚡", type:"high", unit:"kJ"},
+  { id:"price",         label:"Lowest Price",      icon:"💰", type:"low",  unit:"$" },
+  { id:"carbohydrate",  label:"Highest Carbs",     icon:"🍞", type:"high", unit:"g" },
+];
+const MOD_SET_B = [
+  { id:"protein",       label:"Lowest Protein",   icon:"🤏", type:"low",  unit:"g" },
+  { id:"sugars",        label:"Highest Sugar",    icon:"🍬", type:"high", unit:"g" },
+  { id:"dietary_fibre", label:"Lowest Fibre",     icon:"🌾", type:"low",  unit:"g" },
+  { id:"sodium",        label:"Highest Sodium",   icon:"🧂", type:"high", unit:"mg"},
+  { id:"fat",           label:"Highest Fat",      icon:"🧈", type:"high", unit:"g" },
+  { id:"energy_kj",     label:"Lowest Energy",    icon:"😴", type:"low",  unit:"kJ"},
+  { id:"price",         label:"Highest Price",    icon:"💎", type:"high", unit:"$" },
+  { id:"carbohydrate",  label:"Lowest Carbs",     icon:"🥦", type:"low",  unit:"g" },
+];
+
+// ── GAME STATE ─────────────────────────────────────────────────────
+let playerDeck = [], compDeck = [], tiePile = [];
+let activePlayer = null, activeComp = null;
+let swapsLeft = 2;
+let canInteract = false;
+let currentMods = [];
+let modSetToggle = false;
+let gameStarted = false;
+
+// ── HELPERS ────────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function fmt(val, unit) {
+  if (unit === '$') return '$' + val.toFixed(2);
+  return val + unit;
+}
+
+// ── SPLASH → GAME ──────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Unlock audio context on first tap (required on iOS/Android)
+  const unlock = () => { getCtx(); document.removeEventListener('touchstart', unlock); document.removeEventListener('mousedown', unlock); };
+  document.addEventListener('touchstart', unlock, { once: true });
+  document.addEventListener('mousedown', unlock, { once: true });
+
+  setTimeout(() => {
+    const s = document.getElementById('splash');
+    s.classList.add('hiding');
+    setTimeout(() => {
+      s.style.display = 'none';
+      document.getElementById('game').style.display = 'flex';
+    }, 500);
+  }, 2800);
+  buildModGrid();
+});
+
+// ── MOD GRID ───────────────────────────────────────────────────────
+function buildModGrid(remixing = false) {
+  const src = modSetToggle ? MOD_SET_B : MOD_SET_A;
+  currentMods = shuffle(src);
+  modSetToggle = !modSetToggle;
+
+  const grid = document.getElementById('mod-grid');
+
+  if (remixing) {
+    // Flash remix animation before rebuilding
+    grid.classList.add('remixing');
+    sfxBoxReveal();
+    setTimeout(() => {
+      grid.classList.remove('remixing');
+      _renderModCells(grid);
+    }, 700);
+  } else {
+    _renderModCells(grid);
+  }
+}
+
+function _renderModCells(grid) {
+  grid.innerHTML = '';
+  currentMods.forEach((mod, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'mod-cell';
+    cell.dataset.idx = i;
+    cell.innerHTML = `
+      <div class="mod-cell-inner" id="mod-inner-${i}">
+        <span class="mod-cell-icon">${mod.icon}</span>
+        <span class="mod-cell-label">${mod.label}</span>
+        <div class="mod-used-stamp">USED</div>
+      </div>`;
+    cell.addEventListener('click', () => onModClick(cell, mod, i));
+    grid.appendChild(cell);
+  });
+}
+
+function onModClick(cell, mod, idx) {
+  if (!canInteract) return;
+  const inner = document.getElementById('mod-inner-' + idx);
+  if (cell.classList.contains('used')) return;
+
+  canInteract = false;
+  document.getElementById('swap-btn').disabled = true;
+
+  cell.classList.add('used');
+  sfxBoxReveal();
+
+  setStatus(`${mod.icon} ${mod.label}! Revealing Trolley Master's card...`);
+
+  setTimeout(() => {
+    clearTMHint();
+    document.getElementById('comp-inner').classList.add('flipped');
+    sfxCardFlip();
+    document.getElementById('comp-slot').classList.add('revealed');
+    // 2 second theatre pause before result
+    setTimeout(() => resolveBattle(mod), 2000);
+  }, 900);
+}
+
+// ── DEAL ────────────────────────────────────────────────────────────
+function startDeal() {
+  if (gameStarted) return;
+  gameStarted = true;
+
+  const deck = document.getElementById('dealer-deck');
+  deck.style.display = 'none';
+  document.getElementById('deal-btn').style.display = 'none';
+
+  const shuffled = shuffle(ALL_PRODUCTS);
+  playerDeck = shuffled.slice(0, 10);
+  compDeck = shuffled.slice(10, 20);
+
+  let i = 0;
+  const dealerRect = document.getElementById('pile-box').getBoundingClientRect();
+
+  const interval = setInterval(() => {
+    if (i >= 20) {
+      clearInterval(interval);
+      updateCounts();
+      setTimeout(startRound, 400);
+      return;
+    }
+
+    const isPlayer = i % 2 === 0;
+    const target = document.getElementById(isPlayer ? 'player-count' : 'comp-count').closest('.stack-box');
+    const tRect = target.getBoundingClientRect();
+
+    const el = document.createElement('div');
+    el.className = 'deal-anim';
+    el.innerHTML = `<img src="logo.png" alt="">`;
+    el.style.left = (dealerRect.left + dealerRect.width/2 - 25) + 'px';
+    el.style.top  = (dealerRect.top + window.scrollY + dealerRect.height/2 - 37) + 'px';
+    document.body.appendChild(el);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.left = (tRect.left + tRect.width/2 - 25) + 'px';
+        el.style.top  = (tRect.top + window.scrollY + tRect.height/2 - 37) + 'px';
+        el.style.transform = 'rotate(8deg)';
+      });
+    });
+
+    setTimeout(() => {
+      el.remove();
+      updateCounts();
+      sfxCardSwish(0);
+    }, 460);
+
+    i++;
+  }, 200);
+
+  setStatus('Shuffling and dealing 10 cards each...');
+}
+
+// ── CATEGORY HINTS ────────────────────────────────────────────────
+const CAT_HINTS = {
+  cereal:          { icon: '🥣', label: 'Cereal'       },
+  biscuits:        { icon: '🍪', label: 'Biscuits'     },
+  spreads:         { icon: '🫙', label: 'Spreads'      },
+  yoghurt:         { icon: '🍦', label: 'Yoghurt'      },
+  tinned:          { icon: '🥫', label: 'Tinned'       },
+  'rice pasta':    { icon: '🍝', label: 'Rice & Pasta' },
+  sauces:          { icon: '🫙', label: 'Sauces'       },
+  milk:            { icon: '🥛', label: 'Milk'         },
+  'juices cordials':{ icon: '🧃', label: 'Juice'       },
+  frozen:          { icon: '🧊', label: 'Frozen Food'  },
+  icecreams:       { icon: '🍨', label: 'Ice Cream'    },
+};
+
+function getCategoryFromImg(img) {
+  // img is like "products/cereal/Goldenvalejustbran1.png"
+  const parts = img.split('/');
+  return parts.length >= 2 ? parts[1].toLowerCase() : '';
+}
+
+function setTMHint(product) {
+  const cat = getCategoryFromImg(product.img);
+  const hint = CAT_HINTS[cat] || { icon: '🛒', label: 'Mystery' };
+  const el = document.getElementById('tm-hint');
+  el.innerHTML = `<span class="tm-hint-icon">${hint.icon}</span><span class="tm-hint-txt">${hint.label}</span>`;
+  el.style.opacity = '1';
+}
+
+function clearTMHint() {
+  const el = document.getElementById('tm-hint');
+  if (el) el.style.opacity = '0';
+}
+
+// ── ROUND ───────────────────────────────────────────────────────────
+function startRound() {
+  if (playerDeck.length === 0 || compDeck.length === 0) {
+    endGame();
+    return;
+  }
+
+  // Check if all boxes used
+  const allUsed = document.querySelectorAll('.mod-cell.used').length === 8;
+  if (allUsed) {
+    setStatus('🔄 Rules remix incoming...');
+    setTimeout(() => {
+      buildModGrid(true);
+      setStatus('⚡ New rules — choose your battle!');
+      setTimeout(startRound, 900);
+    }, 600);
+    return;
+  }
+
+  activePlayer = playerDeck.shift();
+  activeComp   = compDeck.shift();
+  updateCounts();
+
+  // Reset card displays
+  const pi = document.getElementById('player-inner');
+  const ci = document.getElementById('comp-inner');
+  pi.classList.remove('flipped');
+  ci.classList.remove('flipped');
+  document.getElementById('player-slot').classList.remove('revealed', 'your-turn');
+  document.getElementById('comp-slot').classList.remove('revealed');
+
+  // Populate HTML stat cards
+  buildCardFace('player', activePlayer);
+  buildCardFace('comp',   activeComp);
+
+  // Set category hint on TM face-down card
+  setTMHint(activeComp);
+
+  // Reveal player card after short delay
+  setTimeout(() => {
+    pi.classList.add('flipped');
+    sfxCardFlip();
+    document.getElementById('player-slot').classList.add('revealed', 'your-turn');
+    if (swapsLeft > 0) document.getElementById('swap-btn').disabled = false;
+    canInteract = true;
+    setStatus('Pick a battle rule — choose wisely! 👇');
+  }, 500);
+}
+
+// ── BUILD HTML CARD FACE ─────────────────────────────────────────────
+function buildCardFace(who, product) {
+  document.getElementById(who + '-cf-name').textContent  = product.name;
+  document.getElementById(who + '-cf-price').textContent = '$' + product.price.toFixed(2);
+  document.getElementById(who + '-cf-img').src           = product.img;
+  document.getElementById(who + '-cf-img').alt           = product.name;
+
+  const rows = [
+    ['Energy',   product.energy_kj     + ' kJ'],
+    ['Protein',  product.protein       + ' g'],
+    ['Fat',      product.fat           + ' g'],
+    ['Sat Fat',  product.saturated_fat + ' g'],
+    ['Carbs',    product.carbohydrate  + ' g'],
+    ['Sugars',   product.sugars        + ' g'],
+    ['Fibre',    product.dietary_fibre + ' g'],
+    ['Sodium',   product.sodium        + ' mg'],
+  ];
+
+  const container = document.getElementById(who + '-cf-rows');
+  container.innerHTML = rows.map(([label, val]) => `
+    <div class="cf-row">
+      <span class="cf-row-label">${label}</span>
+      <span class="cf-row-val">${val}</span>
+    </div>`).join('');
+}
+
+// ── RESOLVE ─────────────────────────────────────────────────────────
+function resolveBattle(mod) {
+  const pVal = activePlayer[mod.id];
+  const cVal = activeComp[mod.id];
+  const isTie = pVal === cVal;
+
+  let playerWins = false;
+  if (!isTie) {
+    playerWins = mod.type === 'high' ? pVal > cVal : pVal < cVal;
+  }
+
+  const pFmt = fmt(pVal, mod.unit);
+  const cFmt = fmt(cVal, mod.unit);
+
+  if (isTie) {
+    sfxTie();
+    showResult('tie', '🤝', 'DEAD HEAT',
+      `Both score ${pFmt} — the pile grows!`,
+      pFmt, cFmt, false, false);
+    tiePile.push(activePlayer, activeComp);
+  } else if (playerWins) {
+    sfxRoundWin();
+    showResult('win', '⚡', 'YOU WIN!',
+      `${activePlayer.name} takes it!`,
+      pFmt, cFmt, true, false);
+    playerDeck.push(activePlayer, activeComp, ...tiePile);
+    tiePile = [];
+  } else {
+    sfxRoundLose();
+    showResult('lose', '🛒', 'TM WINS',
+      `The Trolley Master cleans up!`,
+      pFmt, cFmt, false, true);
+    compDeck.push(activePlayer, activeComp, ...tiePile);
+    tiePile = [];
+  }
+
+  activePlayer = null;
+  activeComp   = null;
+  document.getElementById('player-slot').classList.remove('your-turn');
+  document.getElementById('swap-btn').disabled = true;
+
+  setTimeout(() => {
+    updateCounts();
+    startRound();
+  }, 5200);
+}
+
+// ── RESULT OVERLAY ──────────────────────────────────────────────────
+function showResult(type, emoji, headline, detail, pVal, cVal, pWins, cWins) {
+  const overlay  = document.getElementById('result-overlay');
+  const card     = document.getElementById('result-card');
+  const bg       = document.getElementById('result-bg');
+
+  document.getElementById('result-emoji').textContent    = emoji;
+  document.getElementById('result-headline').textContent = headline;
+  document.getElementById('result-detail').textContent   = detail;
+  document.getElementById('rv-player').textContent = pVal;
+  document.getElementById('rv-comp').textContent   = cVal;
+
+  // Style winner value
+  document.getElementById('rv-player').classList.toggle('winner', pWins);
+  document.getElementById('rv-comp').classList.toggle('winner', cWins);
+
+  card.className = 'win lose tie'.split(' ').reduce((c, t) => c.replace(t,''), card.className).trim() + ' ' + type;
+  bg.className   = 'win lose tie'.split(' ').reduce((c, t) => c.replace(t,''), bg.className).trim() + ' ' + type;
+
+  overlay.classList.remove('hiding');
+  overlay.classList.add('show');
+
+  setTimeout(() => {
+    overlay.classList.add('hiding');
+    setTimeout(() => {
+      overlay.classList.remove('show', 'hiding');
+    }, 300);
+  }, 4600);
+
+  updateCounts();
+}
+
+// ── SWAP ────────────────────────────────────────────────────────────
+function doSwap() {
+  if (!canInteract || swapsLeft <= 0 || !activePlayer) return;
+  swapsLeft--;
+  sfxSwap();
+  document.getElementById('swap-count').textContent = swapsLeft + ' swaps left';
+  document.getElementById('swap-btn').disabled = true;
+
+  [activePlayer, activeComp] = [activeComp, activePlayer];
+  buildCardFace('player', activePlayer);
+  buildCardFace('comp',   activeComp);
+
+  // Flash animation
+  const pi = document.getElementById('player-inner');
+  pi.style.transition = 'none';
+  pi.classList.remove('flipped');
+  setTimeout(() => {
+    pi.style.transition = '';
+    pi.classList.add('flipped');
+  }, 100);
+
+  setStatus('🔄 Cards swapped! Now pick your box.');
+}
+
+// ── ZOOM ─────────────────────────────────────────────────────────────
+function openZoom(who) {
+  const src = who === 'player'
+    ? document.getElementById('player-img').src
+    : document.getElementById('comp-img').src;
+
+  const inner = document.getElementById(who + '-inner');
+  if (!inner.classList.contains('flipped')) return; // can't zoom face-down
+
+  document.getElementById('zoom-img').src = src;
+  document.getElementById('zoom-modal').classList.add('open');
+}
+function closeZoom() {
+  document.getElementById('zoom-modal').classList.remove('open');
+}
+
+// ── RULES ─────────────────────────────────────────────────────────────
+function openRules() {
+  document.getElementById('rules-modal').classList.add('open');
+}
+function closeRules() {
+  document.getElementById('rules-modal').classList.remove('open');
+}
+
+// ── COUNTERS ─────────────────────────────────────────────────────────
+function updateCounts() {
+  document.getElementById('player-count').textContent = playerDeck.length + (activePlayer ? 1 : 0);
+  document.getElementById('comp-count').textContent   = compDeck.length  + (activeComp  ? 1 : 0);
+  document.getElementById('pile-count').textContent   = tiePile.length;
+  document.getElementById('s-player').textContent     = playerDeck.length + (activePlayer ? 1 : 0);
+  document.getElementById('s-comp').textContent       = compDeck.length   + (activeComp  ? 1 : 0);
+}
+
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+}
+
+// ── GAME OVER ─────────────────────────────────────────────────────────
+function endGame() {
+  const playerWon = compDeck.length === 0;
+  const go = document.getElementById('gameover');
+  if (playerWon) {
+    sfxJackpot();
+  } else {
+    sfxGameLose();
+  }
+  document.getElementById('go-emoji').textContent = playerWon ? '🏆' : '🛒';
+  document.getElementById('go-title').textContent = playerWon ? 'CHAMPION!' : 'TROLLED!';
+  document.getElementById('go-sub').textContent   = playerWon
+    ? 'You emptied the Trolley Master\'s cart!'
+    : 'The Trolley Master cleaned you out. Try again!';
+  go.classList.add('open');
+}
+
+function restartGame() {
+  playerDeck = []; compDeck = []; tiePile = [];
+  activePlayer = null; activeComp = null;
+  swapsLeft = 2; canInteract = false; gameStarted = false;
+  modSetToggle = false;
+
+  document.getElementById('player-count').textContent = '-';
+  document.getElementById('comp-count').textContent   = '-';
+  document.getElementById('pile-count').textContent   = '0';
+  document.getElementById('s-player').textContent     = '-';
+  document.getElementById('s-comp').textContent       = '-';
+  document.getElementById('swap-count').textContent   = '2 swaps left';
+  document.getElementById('swap-btn').disabled = true;
+
+  const pi = document.getElementById('player-inner');
+  const ci = document.getElementById('comp-inner');
+  pi.classList.remove('flipped');
+  ci.classList.remove('flipped');
+  document.getElementById('player-slot').classList.remove('revealed','your-turn');
+  document.getElementById('comp-slot').classList.remove('revealed');
+
+  document.getElementById('dealer-deck').style.display = 'flex';
+  document.getElementById('deal-btn').style.display    = 'block';
+  document.getElementById('gameover').classList.remove('open');
+
+  buildModGrid();
+  setStatus('Tap DEAL to begin!');
+}
+</script>
+</body>
+</html>
