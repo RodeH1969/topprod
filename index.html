@@ -1928,7 +1928,7 @@ function doShare() {
              + `Sweet! I beat Today's Trolley Master in ${rounds} rounds! 🏆\n`
              + `${squares}\n\n`
              + `🟩 My wins  🟥 TM wins  🟦 Tie\n\n`
-             + `Have a crack! 👉 ${location.href}`;
+             + `That's a tale worth telling!! Can you beat them? 👉 ${location.href}`;
 
   if (navigator.share) {
     navigator.share({ title: 'TOP PROD', text: text, url: location.href })
@@ -1953,20 +1953,25 @@ function doTomorrow() {
 }
 
 function restartGame() {
-  let playerDeck = [], compDeck = [], tiePile = [];
+  // Reset global state — no 'let' here or it creates local vars instead
+  playerDeck = []; compDeck = []; tiePile = [];
   roundHistory = [];
   activePlayer = null; activeComp = null;
   swapsLeft = 2; canInteract = false; gameStarted = false;
   modSetToggle = false;
 
+  // Reset score display
   document.getElementById('player-count').textContent = '-';
   document.getElementById('comp-count').textContent   = '-';
   document.getElementById('pile-count').textContent   = '0';
   document.getElementById('s-player').textContent     = '-';
   document.getElementById('s-comp').textContent       = '-';
+
+  // Reset swap
   document.getElementById('swap-count').textContent   = '2 swaps left';
   document.getElementById('swap-btn').disabled = true;
 
+  // Reset cards to face-down
   const pi = document.getElementById('player-inner');
   const ci = document.getElementById('comp-inner');
   pi.classList.remove('flipped');
@@ -1974,13 +1979,23 @@ function restartGame() {
   document.getElementById('player-slot').classList.remove('revealed','your-turn');
   document.getElementById('comp-slot').classList.remove('revealed');
 
+  // Clear TM hint
+  clearTMHint();
+
+  // Show deal button
   document.getElementById('dealer-deck').style.display = 'flex';
   document.getElementById('deal-btn').style.display    = 'block';
+
+  // Hide game over screens
   document.getElementById('gameover').classList.remove('open');
   document.getElementById('go-win').style.display  = 'none';
   document.getElementById('go-lose').style.display = 'none';
   const tb = document.getElementById('go-tomorrow-btn');
   tb.textContent = '🗓️ Play Tomorrow'; tb.disabled = false;
+
+  // Rebuild mod grid fresh
+  buildModGrid();
+
   setStatus('Tap DEAL to begin!');
 }
 </script>
