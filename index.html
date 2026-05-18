@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/x-icon" href="logo.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>TOP PROD: Battle of the Brands</title>
+<title>TOP PROD: Beat Today's Trolley Master</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -737,7 +737,7 @@
     </div>
   </div>
   <div id="splash-title">TOP PROD</div>
-  <div id="splash-sub">Battle of the Brands</div>
+  <div id="splash-sub">Beat Today's Trolley Master</div>
 </div>
 
 <!-- GAME -->
@@ -748,7 +748,7 @@
     <div style="display:flex;align-items:center;gap:10px;">
       <div>
         <div id="hdr-title">TOP PROD</div>
-        <div id="hdr-sub">Battle of the Brands</div>
+        <div id="hdr-sub">Beat Today's Trolley Master</div>
       </div>
       <button id="rules-btn" onclick="openRules()">Rules</button>
     </div>
@@ -887,7 +887,7 @@
     </div>
     <div id="rules-heading">HOW TO PLAY</div>
 
-    <div class="rules-step"><span class="rs-num">1</span><span class="rs-txt">Tap <b>DEAL</b> — you and the Trolley Master each get 10 cards from 77 real Aldi products.</span></div>
+    <div class="rules-step"><span class="rs-num">1</span><span class="rs-txt">To win you must reduce the <b>Trolley Master's stack to 0!</b> You and the Trolley Master each get <b>5 cards</b> from 77 real Aldi products.</span></div>
     <div class="rules-step"><span class="rs-num">2</span><span class="rs-txt">Your card flips face-up. Study your product's nutrition stats and price.</span></div>
     <div class="rules-step"><span class="rs-num">3</span><span class="rs-txt">You can see all <b>8 battle rules</b> — pick one strategically. e.g. <em>💪 Highest Protein</em> or <em>💰 Lowest Price</em>. That rule decides the winner.</span></div>
     <div class="rules-step"><span class="rs-num">4</span><span class="rs-txt">The Trolley Master's card flips. Whoever wins the chosen stat takes both cards.</span></div>
@@ -1489,14 +1489,14 @@ function startDeal() {
   document.getElementById('deal-btn').style.display = 'none';
 
   const shuffled = shuffle(ALL_PRODUCTS);
-  playerDeck = shuffled.slice(0, 10);
-  compDeck = shuffled.slice(10, 20);
+  playerDeck = shuffled.slice(0, 5);
+  compDeck = shuffled.slice(5, 10);
 
   let i = 0;
   const dealerRect = document.getElementById('pile-box').getBoundingClientRect();
 
   const interval = setInterval(() => {
-    if (i >= 20) {
+    if (i >= 10) {
       clearInterval(interval);
       updateCounts();
       setTimeout(startRound, 400);
@@ -1531,7 +1531,7 @@ function startDeal() {
     i++;
   }, 200);
 
-  setStatus('Shuffling and dealing 10 cards each...');
+  setStatus('Shuffling and dealing 5 cards each...');
 }
 
 // ── CATEGORY HINTS ────────────────────────────────────────────────
